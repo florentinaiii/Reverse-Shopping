@@ -21,23 +21,9 @@ export default function MyRecipes() {
   return (
     <View style={{ flex: 1, padding: 20, backgroundColor: "#f8f8f8" }}>
       {/* Titulli */}
-      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}>📜 Recetat e Mia</Text>
+      <Text style={{ fontSize: 24, fontWeight: "bold", marginBottom: 10 }}>📜 Recetat e Ruajtura</Text>
 
-      {/* Butoni për shtim recetash */}
-      <TouchableOpacity
-        style={{
-          backgroundColor: "#007AFF",
-          padding: 12,
-          borderRadius: 10,
-          alignItems: "center",
-          marginBottom: 15,
-          flexDirection: "row",
-          justifyContent: "center",
-        }}
-      >
-        <Ionicons name="add-circle-outline" size={24} color="white" />
-        <Text style={{ color: "white", fontWeight: "bold", marginLeft: 5 }}>Shto Recetë</Text>
-      </TouchableOpacity>
+     
 
       {/* Lista e Recetave të Ruajtura */}
       <FlatList
@@ -51,6 +37,7 @@ export default function MyRecipes() {
               padding: 10,
               borderRadius: 10,
               marginBottom: 10,
+              marginTop: 20,
               alignItems: "center",
               shadowColor: "#000",
               shadowOpacity: 0.1,

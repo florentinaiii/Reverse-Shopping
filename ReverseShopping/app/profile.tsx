@@ -59,26 +59,7 @@ export default function Profile() {
       </View>
 
       {/* Dark Mode Switch */}
-      <View
-        style={{
-          flexDirection: "row",
-          justifyContent: "space-between",
-          alignItems: "center",
-          marginVertical: 15,
-          backgroundColor: darkMode ? "#444" : "#fff",
-          paddingVertical: 15,
-          paddingHorizontal: 20,
-          borderRadius: 10,
-          shadowColor: "#000",
-          shadowOffset: { width: 0, height: 4 },
-          shadowOpacity: 0.1,
-          shadowRadius: 4,
-        }}
-      >
-        <Text style={{ fontSize: 18, color: darkMode ? "#fff" : "#000" }}>🌙 Dark Mode</Text>
-        <Switch value={darkMode} onValueChange={setDarkMode} />
-      </View>
-
+     
       {/* Butoni për Dalje nga Llogaria */}
       <TouchableOpacity
         onPress={handleLogout}
@@ -90,6 +71,7 @@ export default function Profile() {
           alignItems: "center",
           justifyContent: "center",
           marginVertical: 25,
+          marginTop: 110,
           flexDirection: "row",
           shadowColor: "#000",
           shadowOffset: { width: 0, height: 4 },
