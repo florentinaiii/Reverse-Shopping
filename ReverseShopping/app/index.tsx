@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, ImageBackground, Image, ScrollView, StyleSheet } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, Image, ScrollView, StyleSheet } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { Camera } from "expo-camera";
 
@@ -51,38 +51,39 @@ export default function App() {
 
 function HomePage({ onSelectRecipe, searchQuery, setSearchQuery, onSearch, filteredRecipes }) {
   return (
-    <ImageBackground source={require("../assets/images/background.png")} style={styles.background}>
-      <View style={styles.container}>
-        <Text style={styles.header}>🔍 Kërko Receta</Text>
-        <View style={styles.searchContainer}>
-          <Ionicons name="search" size={24} color="#888" style={styles.searchIcon} />
-          <TextInput 
-            placeholder="Shkruaj përbërësit ose fotografo..." 
-            value={searchQuery} 
-            onChangeText={setSearchQuery} 
-            style={styles.input} 
-          />
-          <TouchableOpacity style={styles.cameraButton}>
-            <Ionicons name="camera" size={24} color="white" />
-          </TouchableOpacity>
-          <TouchableOpacity onPress={onSearch} style={styles.searchButton}>
-            <Text style={styles.searchButtonText}>Kërko</Text>
-          </TouchableOpacity>
-        </View>
-        <FlatList
-          data={filteredRecipes}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <TouchableOpacity onPress={() => onSelectRecipe(item)} style={styles.recipeCard}>
-              <Image source={item.image} style={styles.recipeImage} />
-              <View style={styles.textContainer}>
-                <Text style={styles.recipeText}>{item.name}</Text>
-              </View>
-            </TouchableOpacity>
-          )}
-        />
+    <View style={styles.container}>
+      <View style={styles.headerContainer}>
+        <Text style={styles.header}>Reverse Shopping</Text>
+        <Text style={styles.subHeader}>Zbulo receta të reja dhe krijo magji në kuzhinë</Text>
       </View>
-    </ImageBackground>
+      <View style={styles.searchContainer}>
+        <Ionicons name="search" size={24} color="#888" style={styles.searchIcon} />
+        <TextInput 
+          placeholder="Shkruaj përbërësit ose fotografo..." 
+          value={searchQuery} 
+          onChangeText={setSearchQuery} 
+          style={styles.input} 
+        />
+        <TouchableOpacity style={styles.cameraButton}>
+          <Ionicons name="camera" size={24} color="white" />
+        </TouchableOpacity>
+        <TouchableOpacity onPress={onSearch} style={styles.searchButton}>
+          <Text style={styles.searchButtonText}>Kërko</Text>
+        </TouchableOpacity>
+      </View>
+      <FlatList
+        data={filteredRecipes}
+        keyExtractor={(item) => item.id}
+        renderItem={({ item }) => (
+          <TouchableOpacity onPress={() => onSelectRecipe(item)} style={styles.recipeCard}>
+            <Image source={item.image} style={styles.recipeImage} />
+            <View style={styles.textContainer}>
+              <Text style={styles.recipeText}>{item.name}</Text>
+            </View>
+          </TouchableOpacity>
+        )}
+      />
+    </View>
   );
 }
 
@@ -99,27 +100,63 @@ function RecipeDetail({ recipe, onBack }) {
       <Text style={styles.subHeader}>Përgatitja:</Text>
       <Text style={styles.instructions}>{recipe.instructions}</Text>
     </ScrollView>
-    
   );
 }
 
+
 const styles = StyleSheet.create({
-  background: {flex: 1, width: "100%"},
-  container: { flex: 1, padding: 20, backgroundColor: "rgba(255, 255, 255, 0.8)" },
-  header: { fontSize: 24, fontWeight: "bold", marginBottom: 20 },
-  searchContainer: { flexDirection: "row", alignItems: "center", backgroundColor: "#fff", borderRadius: 25, paddingHorizontal: 15, paddingVertical: 10, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  container: { flex: 1, padding: 20, backgroundColor: "white" },
+  headerContainer: { 
+    justifyContent: "center", 
+    alignItems: "center", 
+    marginBottom: 30 
+  },
+  header: { 
+    fontSize: 28, 
+    fontWeight: "bold", 
+    textAlign: "center", 
+    marginBottom: 10 
+  },
+  subHeader: { 
+    fontSize: 16, 
+    fontWeight: "bold", 
+    textAlign: "center",
+    marginBottom: 30 
+  },
+  searchContainer: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    backgroundColor: "#fff", 
+    borderRadius: 25, 
+    paddingHorizontal: 15, 
+    paddingVertical: 10, 
+    shadowColor: "#000", 
+    shadowOpacity: 0.1, 
+    shadowRadius: 4, 
+    elevation: 2 
+  },
   searchIcon: { marginRight: 10 },
   input: { flex: 1, fontSize: 16, color: "#333" },
   cameraButton: { backgroundColor: "#007AFF", padding: 8, borderRadius: 20, marginRight: 10 },
   searchButton: { backgroundColor: "#007AFF", paddingVertical: 8, paddingHorizontal: 15, borderRadius: 20 },
   searchButtonText: { color: "white", fontWeight: "bold" },
-  recipeCard: { flexDirection: "row", alignItems: "center", backgroundColor: "#fff", padding: 10, marginBottom: 10, borderRadius: 10, shadowColor: "#000", shadowOpacity: 0.1, shadowRadius: 4, elevation: 2 },
+  recipeCard: { 
+    flexDirection: "row", 
+    alignItems: "center", 
+    backgroundColor: "#fff", 
+    padding: 10, 
+    marginBottom: 10, 
+    borderRadius: 10, 
+    shadowColor: "#000", 
+    shadowOpacity: 0.1, 
+    shadowRadius: 4, 
+    elevation: 2 
+  },
   recipeImage: { width: 80, height: 80, borderRadius: 10, marginRight: 10 },
   textContainer: { flex: 1 },
   recipeText: { fontSize: 18, fontWeight: "bold" },
   backButton: { backgroundColor: "#007AFF", padding: 10, borderRadius: 10, alignItems: "center", width: 50, marginBottom: 20 },
   title: { fontSize: 26, fontWeight: "bold", marginBottom: 10 },
-  subHeader: { fontSize: 22, fontWeight: "bold", marginTop: 10 },
   ingredient: { fontSize: 18, marginBottom: 5 },
   instructions: { fontSize: 18, textAlign: "left", marginTop: 10 },
 });
