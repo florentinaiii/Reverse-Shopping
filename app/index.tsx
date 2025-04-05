@@ -1,7 +1,9 @@
 import React, { useState } from "react";
-import { View, Text, TextInput, TouchableOpacity, FlatList, ImageBackground, Image, ScrollView, StyleSheet, KeyboardAvoidingView, Platform } from "react-native";
+import { View, Text, TextInput, TouchableOpacity, FlatList, ImageBackground, Image, ScrollView, StyleSheet, KeyboardAvoidingView, Platform, Dimensions } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFonts, Satisfy_400Regular } from '@expo-google-fonts/satisfy';
+const { width } = Dimensions.get('window');
+const isMobile = width < 768; // Define this before using it in styles
 
 const exampleRecipes = [
   {
@@ -20,6 +22,14 @@ const exampleRecipes = [
   },
   {
     id: "3",
+    name: "Pica Vegjetariane",
+    ingredients: ["Domate", "Djath", "Piper", "Kerpudha", "Ullinj"],
+    image: require("../assets/images/vegpizza.jpg"),
+    instructions: "1. Përgatisni brumin. 2. Vendosni domaten dhe djathin sipër. 3. Shtoni perimet. 4. Piqni në furrë."
+  },
+
+  {
+    id: "4",
     name: "Pica Vegjetariane",
     ingredients: ["Domate", "Djath", "Piper", "Kerpudha", "Ullinj"],
     image: require("../assets/images/vegpizza.jpg"),
@@ -93,7 +103,7 @@ function HomePage({ onSelectRecipe, searchQuery, setSearchQuery, onSearch, filte
           )}
         </View>
 
-        {/* Search Bar - Always visible but moves up when searching */}
+        {/* Search Bar */}
         <View style={[styles.searchContainer, hasSearched && styles.searchContainerSmall]}>
           <View style={styles.searchBar}>
             <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
@@ -105,7 +115,7 @@ function HomePage({ onSelectRecipe, searchQuery, setSearchQuery, onSearch, filte
                 setSearchQuery(text);
                 if (text === "") {
                   setHasSearched(false);
-                  filteredRecipes([]);
+                  setFilteredRecipes([]);
                 }
               }}
               onSubmitEditing={onSearch}
@@ -117,28 +127,34 @@ function HomePage({ onSelectRecipe, searchQuery, setSearchQuery, onSearch, filte
           </View>
         </View>
 
-        {/* Recipe List - Shows only after search */}
+        {/* Recipe List */}
         {hasSearched && (
           <View style={styles.recipeGrid}>
             {filteredRecipes.length > 0 ? (
               <FlatList
                 data={filteredRecipes}
                 keyExtractor={(item) => item.id}
-                numColumns={2}
+                numColumns={isMobile ? 2 : 4} // Responsive columns
                 columnWrapperStyle={styles.columnWrapper}
                 renderItem={({ item }) => (
                   <TouchableOpacity 
                     onPress={() => onSelectRecipe(item)} 
                     style={styles.recipeCard}
+                    activeOpacity={0.8}
                   >
-                    <Image source={item.image} style={styles.recipeImage} />
-                    <View style={styles.recipeInfo}>
-                      <Text style={styles.recipeName}>{item.name}</Text>
-                      <Text style={styles.recipeIngredients}>
-                        {item.ingredients.slice(0, 3).join(", ")}
-                        {item.ingredients.length > 3 ? "..." : ""}
-                      </Text>
-                    </View>
+                    <ImageBackground 
+                      source={item.image} 
+                      style={styles.recipeImage}
+                      imageStyle={styles.imageStyle}
+                    >
+                      <View style={styles.imageOverlay}>
+                        <Text style={styles.recipeName}>{item.name}</Text>
+                        <View style={styles.recipeFooter}>
+                          <Text style={styles.viewRecipeText}>Shiko receten</Text>
+                          <Ionicons name="arrow-forward" size={16} color="white" />
+                        </View>
+                      </View>
+                    </ImageBackground>
                   </TouchableOpacity>
                 )}
                 contentContainerStyle={styles.listContent}
@@ -155,48 +171,55 @@ function HomePage({ onSelectRecipe, searchQuery, setSearchQuery, onSearch, filte
 
 const styles = StyleSheet.create({
   background: { flex: 1, width: "100%", opacity: 0.7 },
-  container: { flex: 1, padding: 20 },
+  container: { 
+    flex: 1, 
+    padding: isMobile ? 20 : 40,
+    maxWidth: 1200, // Max width for web
+    alignSelf: 'center', // Center on web
+    width: '100%',
+  },
   headerContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingTop:180,
+    paddingTop: isMobile ? 180 : 100,
     marginBottom: 20,
+    maxWidth: 1200,
+    alignSelf: 'center',
   },
   headerContainerSmall: {
-    paddingTop: 20,
+    paddingTop: isMobile ? 20 : 40,
     marginBottom: 10,
   },
   appTitle: {
-    fontSize: 35,
+    fontSize: isMobile ? 35 : 42,
     fontWeight: 'bold',
     color: '#000',
     marginBottom: 5,
     letterSpacing: 1,
     fontFamily: 'Satisfy',
+    textAlign: 'center',
   },
   appSubtitle: {
-    fontSize: 20,
+    fontSize: isMobile ? 18 : 22,
     color: '#000',
     marginBottom: 20,
     textAlign: 'center',
-    paddingTop:10,
-
-
+    paddingTop: 10,
   },
   searchContainer: {
     marginBottom: 20,
-    paddingTop:20,
-    paddingBottom:20,
-    paddingLeft:450,
-    paddingRight: 450,
-    
+    paddingTop: 20,
+    paddingBottom: 20,
+    width: '100%',
+    maxWidth: 800,
+    alignSelf: 'center',
+    paddingHorizontal: isMobile ? 20 : 100,
   },
   searchContainerSmall: {
     marginBottom: 10,
-    paddingTop:20,
-    paddingBottom:20,
-    paddingLeft:50,
-    paddingRight: 50,
+    paddingTop: 20,
+    paddingBottom: 20,
+    paddingHorizontal: isMobile ? 20 : 100,
   },
   searchBar: {
     flexDirection: "row",
@@ -206,6 +229,8 @@ const styles = StyleSheet.create({
     paddingHorizontal: 15,
     paddingVertical: 8,
     width: "100%",
+    maxWidth: 600,
+    alignSelf: 'center',
     shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
@@ -215,7 +240,7 @@ const styles = StyleSheet.create({
   searchIcon: { marginRight: 10 },
   searchInput: {
     flex: 1,
-    fontSize: 16,
+    fontSize: isMobile ? 16 : 18,
     color: "#333",
     paddingVertical: 8,
   },
@@ -227,57 +252,63 @@ const styles = StyleSheet.create({
   },
   recipeGrid: {
     flex: 1,
+    width: '100%',
+    maxWidth: 1200,
+    alignSelf: 'center',
   },
   columnWrapper: {
-    justifyContent: 'space-between',
+    justifyContent: isMobile ? 'space-between' : 'center',
     marginBottom: 15,
+    gap: isMobile ? 10 : 20,
   },
   recipeCard: {
-    width: '48%',
+    width: isMobile ? '48%' : '23%',
+    aspectRatio: 1,
     backgroundColor: "white",
     borderRadius: 12,
     overflow: "hidden",
     shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
+    shadowOffset: { width: 0, height: 4 },
     shadowOpacity: 0.1,
-    shadowRadius: 3,
-    elevation: 2,
-    marginBottom: 15,
+    shadowRadius: 4,
+    elevation: 3,
+    marginBottom: isMobile ? 15 : 20,
   },
   recipeImage: {
+    flex: 1,
+    justifyContent: 'flex-end',
     width: '100%',
-    height: 120,
+    height: '100%',
     resizeMode: 'cover',
   },
-  recipeInfo: {
-    padding: 12,
+  imageStyle: {
+    borderRadius: 12,
+  },
+  imageOverlay: {
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    padding: isMobile ? 10 : 15,
+    height: '38%',
   },
   recipeName: {
-    fontSize: 16,
+    fontSize: isMobile ? 16 : 18,
     fontWeight: "bold",
-    marginBottom: 5,
-    color: "#333",
+    color: "white",
+    marginBottom: 8,
   },
-  recipeIngredients: {
-    fontSize: 12,
-    color: "#666",
+  recipeFooter: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'space-between',
+  },
+  viewRecipeText: {
+    color: 'white',
+    fontSize: isMobile ? 14 : 16,
+    fontWeight: '500',
   },
   noResults: {
     textAlign: "center",
     marginTop: 20,
     fontSize: 16,
     color: "#888",
-  },
-  initialMessage: {
-    flex: 1,
-    justifyContent: 'center',
-    alignItems: 'center',
-    padding: 20,
-  },
-  initialMessageText: {
-    fontSize: 18,
-    color: '#888',
-    marginTop: 20,
-    textAlign: 'center',
   },
 });
