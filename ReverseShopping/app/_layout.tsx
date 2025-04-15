@@ -1,5 +1,8 @@
 import { Tabs } from "expo-router";
 import { Ionicons } from "@expo/vector-icons";
+import React from 'react';
+import { Stack } from 'expo-router';
+
 
 export default function RootLayout() {
   return (
@@ -19,12 +22,12 @@ export default function RootLayout() {
             <Ionicons
               name="fast-food-outline"
               size={24}
-              color="#007AFF"
+              color="#000"
               style={{ marginLeft: 10 }}
             />
           ), 
           headerRight: () => (
-            <Ionicons name="home-outline" size={24} color="#007AFF" style={{ marginRight: 10 }} />
+            <Ionicons name="home-outline" size={24} color="#000" style={{ marginRight: 10 }} />
           ), 
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="home-outline" size={size} color={color} />
@@ -34,18 +37,18 @@ export default function RootLayout() {
       <Tabs.Screen
         name="my-recipes"
         options={{
-          title: "Recetat",
+          title: "Recetat e Ruajtura",
           headerTitle: "Reverse Shopping", 
           headerLeft: () => (
             <Ionicons
               name="fast-food-outline"
               size={24}
-              color="#007AFF"
+              color="#000"
               style={{ marginLeft: 10 }}
             />
           ), 
           headerRight: () => (
-            <Ionicons name="book-outline" size={24} color="#007AFF" style={{ marginRight: 10 }} />
+            <Ionicons name="book-outline" size={24} color="#000" style={{ marginRight: 10 }} />
           ), 
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="book-outline" size={size} color={color} />
@@ -61,18 +64,26 @@ export default function RootLayout() {
             <Ionicons
               name="fast-food-outline"
               size={24}
-              color="#007AFF"
+              color="#000"
               style={{ marginLeft: 10 }}
             />
           ), 
           headerRight: () => (
-            <Ionicons name="person-outline" size={24} color="#007AFF" style={{ marginRight: 10 }} />
+            <Ionicons name="person-outline" size={24} color="#000" style={{ marginRight: 10 }} />
           ), 
           tabBarIcon: ({ color, size }) => (
             <Ionicons name="person-outline" size={size} color={color} />
           ),
         }}
       />
+      <Tabs.Screen
+  name="auth"
+  options={{
+    title: "Autentifikimi",
+    headerShown: false,
+    tabBarButton: () => null, // This hides the tab bar button
+  }}
+/>
     </Tabs>
   );
 }
