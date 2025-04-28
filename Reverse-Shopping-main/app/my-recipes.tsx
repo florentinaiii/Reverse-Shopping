@@ -10,23 +10,47 @@ import {
     Platform,
     ActivityIndicator,
     ScrollView,
-    Image
+    Image,
+    Alert
 } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter, useFocusEffect } from 'expo-router';
 import { Recipe } from './index';
+import axios from 'axios';
 
 const { width, height } = Dimensions.get('window');
 const isMobile = width < 768;
 
 const SAVED_RECIPES_KEY = '@saved_recipes';
 
+// Funksioni për përkthimin e tekstit në shqip
+const translateText = async (text: string): Promise<string> => {
+    try {
+        const response = await axios.get('https://api.mymemory.translated.net/get', {
+            params: {
+                q: text,
+                langpair: 'en|sq'
+            }
+        });
+        return response.data.responseData.translatedText || text;
+    } catch (error) {
+        console.error('Translation error:', error);
+        return text;
+    }
+};
+
 export default function MyRecipesScreen() {
     const router = useRouter();
     const [savedRecipes, setSavedRecipes] = useState<Recipe[]>([]);
     const [isLoading, setIsLoading] = useState(true);
     const [viewingRecipe, setViewingRecipe] = useState<Recipe | null>(null);
+    const [translatedRecipe, setTranslatedRecipe] = useState<{
+        name?: string;
+        ingredients?: string[];
+        instructions?: string;
+    }>({});
+    const [isTranslating, setIsTranslating] = useState(false);
 
     const loadSavedRecipes = useCallback(async () => {
         setIsLoading(true);
@@ -75,10 +99,40 @@ export default function MyRecipesScreen() {
 
     const handleShowDetails = (recipe: Recipe) => {
         setViewingRecipe(recipe);
+        setTranslatedRecipe({}); // Reset translation when showing new recipe
     };
 
     const handleBackToList = () => {
         setViewingRecipe(null);
+    };
+
+    const translateRecipe = async () => {
+        if (!viewingRecipe) return;
+
+        setIsTranslating(true);
+        try {
+            // Përkthe emrin
+            const nameTranslated = await translateText(viewingRecipe.name);
+
+            // Përkthe përbërësit
+            const ingredientsTranslated = await Promise.all(
+                viewingRecipe.ingredients.map(ing => translateText(ing))
+            );
+
+            // Përkthe udhëzimet
+            const instructionsTranslated = await translateText(viewingRecipe.instructions);
+
+            setTranslatedRecipe({
+                name: nameTranslated,
+                ingredients: ingredientsTranslated,
+                instructions: instructionsTranslated
+            });
+        } catch (error) {
+            console.error('Translation error:', error);
+            Alert.alert('Gabim', 'Përkthimi dështoi');
+        } finally {
+            setIsTranslating(false);
+        }
     };
 
     if (isLoading) {
@@ -108,7 +162,7 @@ export default function MyRecipesScreen() {
                             <Ionicons name="arrow-back" size={24} color="#333" />
                         </TouchableOpacity>
                         <Text style={styles.detailTitle} numberOfLines={1} ellipsizeMode='tail'>
-                            {viewingRecipe.name}
+                            {translatedRecipe.name || viewingRecipe.name}
                         </Text>
                         <TouchableOpacity
                             onPress={() => handleUnsave(viewingRecipe)}
@@ -117,6 +171,17 @@ export default function MyRecipesScreen() {
                             <Ionicons name="trash-outline" size={24} color="#333" />
                         </TouchableOpacity>
                     </View>
+
+                    <TouchableOpacity
+                        onPress={translateRecipe}
+                        style={styles.translateButton}
+                        disabled={isTranslating}
+                    >
+                        <Ionicons name="language" size={20} color="#007AFF" />
+                        <Text style={styles.translateText}>
+                            {isTranslating ? 'Po përkthehet...' : 'Përkthe në shqip'}
+                        </Text>
+                    </TouchableOpacity>
 
                     <View style={styles.detailContentWrapper}>
                         <View style={styles.detailTopRowContainer}>
@@ -132,7 +197,7 @@ export default function MyRecipesScreen() {
                             <View style={styles.detailIngredientsContainer}>
                                 <View style={styles.section}>
                                     <Text style={styles.sectionTitle}>Përbërësit</Text>
-                                    {viewingRecipe.ingredients.map((ingredient, index) => (
+                                    {(translatedRecipe.ingredients || viewingRecipe.ingredients).map((ingredient, index) => (
                                         <View key={index} style={styles.ingredientItem}>
                                             <Ionicons name="ellipse" size={8} color="#007AFF" style={styles.ingredientIcon} />
                                             <Text style={styles.ingredientText}>{ingredient}</Text>
@@ -145,7 +210,9 @@ export default function MyRecipesScreen() {
                         <View style={styles.detailInstructionsContainer}>
                             <View style={styles.section}>
                                 <Text style={styles.sectionTitle}>Udhëzimet</Text>
-                                <Text style={styles.instructionsText}>{viewingRecipe.instructions}</Text>
+                                <Text style={styles.instructionsText}>
+                                    {translatedRecipe.instructions || viewingRecipe.instructions}
+                                </Text>
                             </View>
                         </View>
                     </View>
@@ -448,5 +515,20 @@ const styles = StyleSheet.create({
         borderRadius: 20,
         padding: 6,
         zIndex: 2,
+    },
+    translateButton: {
+        flexDirection: 'row',
+        alignItems: 'center',
+        backgroundColor: 'rgba(255,255,255,0.8)',
+        padding: 10,
+        borderRadius: 20,
+        marginHorizontal: 15,
+        marginBottom: 15,
+        alignSelf: 'flex-start',
+    },
+    translateText: {
+        marginLeft: 5,
+        color: '#007AFF',
+        fontWeight: '500',
     },
 });
