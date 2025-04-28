@@ -12,71 +12,168 @@ import {
   KeyboardAvoidingView,
   Platform,
   Dimensions,
-  ActivityIndicator, // Importo ActivityIndicator për një loading më të mirë
-  Animated
+  ActivityIndicator,
+  Animated,
+  Alert
 } from "react-native";
 import { Ionicons } from "@expo/vector-icons";
 import { useFonts, Satisfy_400Regular } from '@expo-google-fonts/satisfy';
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import axios from 'axios';
 
 const { width } = Dimensions.get('window');
 const isMobile = width < 768;
 
 // ======== INTERFACE DHE TË DHËNA ========
 
-// Tipi për një objekt Recipe
-export interface Recipe { // Exporto interface për ta përdorur gjetkë
+export interface Recipe {
   id: string;
   name: string;
   ingredients: string[];
-  image: any; // Tipi specifik varet nga si i menaxhon imazhet (p.sh., ImageSourcePropType)
+  image: any;
   instructions: string;
 }
 
-// Lista e recetave (e eksportuar)
-// Shto më shumë receta nëse dëshiron
 export const exampleRecipes: Recipe[] = [
-    {
-        id: "1",
-        name: "Pica Vegjetariane",
-        ingredients: ["brumë pice (i gatshëm ose i bërë në shtëpi)", "150g salcë domatesh", "200g djathë mozzarella (ose djathë vegjetarian)",
-            "1 spec i kuq (i prerë rrathë)", "1 spec i gjelbër (i prerë rrathë)", "100g kërpudha të freskëta (të prera)", "50g ullinj të zeza (pa bërthamë)",
-            "1 lugë vaj ulliri", "Oregano dhe biber sipas shijes"
-        ], image: require("../assets/images/vegpizza.jpg"),
-        instructions: "Për të bërë një picë vegjetariane, fillimisht përgatitni brumin e picës...🍕 Shijojeni picën tuaj vegjetariane! 😊"
-    },
-    {
-        id: "2",
-        name: "Sallate Pule",
-        ingredients: ["Gjoks pule", "Sallatë jeshile", "Domate cherry", "Kastravec", "Qepë e kuqe", "Misër", "Vaj ulliri", "Lëng limoni", "Kripë, piper"],
-        image: require("../assets/images/chickensalad.jpg"),
-        instructions: "1. Marino gjoksin e pulës dhe piqeni në skarë ose tigan derisa të jetë gatuar plotësisht. Lëreni të ftohet pak dhe priteni në shirita ose kube...\n3. Shtoni vajin e ullirit, lëngun e limonit, kripën dhe piperin. Përziejeni mirë dhe shërbejeni menjëherë."
-    },
-    {
-        id: "3",
-        name: "Pasta Carbonara",
-        ingredients: ["Spageti", "2 vezë", "100g guanciale ose pancetta", "50g djathë Pecorino Romano", "Piper i zi i sapobluar", "Kripë"],
-        image: require("../assets/images/pastacarbonara.jpg"),
-        instructions: "1. Zieni spagetit në ujë me kripë sipas udhëzimeve të paketimit.\n2. Ndërkohë, skuqni guanciale/pancetta në një tigan derisa të bëhet krokante...\n4. Shtoni spagetit e kulluar në tigan dhe përzieni mirë. Shërbejeni menjëherë me ekstra djathë Pecorino dhe piper të zi."
-    },
-    {
-        id: "4",
-        name: "Supë Perimesh Kremoze", // Ndryshova emrin dhe përmbajtjen
-        ingredients: ["1 lugë gjelle vaj ulliri", "1 qepë e grirë", "2 karota të prera", "2 kërcenj selinoje të prerë", "4 patate mesatare, të qëruara dhe të prera", "1 litër lëng perimesh", "200ml qumësht ose pana gatimi", "Kripë dhe piper sipas shijes", "Majdanoz i freskët për zbukurim"],
-        image: require("../assets/images/supe.jpg"), // Supozojmë një imazh supe
-        instructions: "1. Ngrohni vajin e ullirit në një tenxhere të madhe. Skuqni qepën, karotat dhe selinonë derisa të zbuten (rreth 5-7 minuta).\n2. Shtoni patatet dhe lëngun e perimeve. Lërini të ziejnë, pastaj ulni zjarrin dhe lërini të ziejnë ngadalë për 15-20 minuta, ose derisa patatet të jenë shumë të buta.\n3. Përdorni një blender zhytës për të bërë supën kremoze direkt në tenxhere (ose transferojeni me kujdes në një blender normal dhe kthejeni në tenxhere).\n4. Shtoni qumështin ose panën, kripën dhe piperin. Përziejeni dhe ngroheni përsëri pa e lënë të vlojë.\n5. Shërbejeni të nxehtë, të zbukuruar me majdanoz të freskët."
-    },
-    {
-      id: "5",
-      name: "Tiramisu Klasike", // Recetë e re
-      ingredients: ["6 të verdha veze", "1 filxhan sheqer", "500g djathë mascarpone", "1 1/2 filxhan kafe espresso të fortë, të ftohur", "1/4 filxhan liker kafeje (opsionale)", "Rreth 24-30 biskota savoiardi (ladyfingers)", "Pluhur kakao pa sheqer për spërkatje"],
-      image: require("../assets/images/tiramisu.jpg"), // Supozojmë një imazh tiramisu
-      instructions: "1. Rrihni të verdhat e vezëve me sheqerin në një tas të madh derisa të zbardhen dhe të trashen.\n2. Shtoni djathin mascarpone dhe përziejeni butësisht derisa të kombinohen mirë pa e tepruar.\n3. Në një pjatë të cekët, përzieni kafenë espresso të ftohur me likerin (nëse po e përdorni).\n4. Zhytni shpejt secilën biskotë savoiardi në përzierjen e kafesë (mos i lini të lagen shumë) dhe vendosni një shtresë në fund të një ene qelqi drejtkëndëshe (p.sh., 20x30 cm).\n5. Mbuloni shtresën e biskotave me gjysmën e kremit të mascarpones.\n6. Përsëritni me një shtresë tjetër biskotash të lagura dhe pjesën e mbetur të kremit.\n7. Mbulojeni enën dhe vendoseni në frigorifer për të paktën 4-6 orë, ose idealisht gjatë gjithë natës.\n8. Para se ta shërbeni, spërkateni sipërfaqen bollshëm me pluhur kakao."
+  {
+    id: "1",
+    name: "Pica Vegjetariane",
+    ingredients: ["brumë pice (i gatshëm ose i bërë në shtëpi)", "150g salcë domatesh", "200g djathë mozzarella (ose djathë vegjetarian)",
+      "1 spec i kuq (i prerë rrathë)", "1 spec i gjelbër (i prerë rrathë)", "100g kërpudha të freskëta (të prera)", "50g ullinj të zeza (pa bërthamë)",
+      "1 lugë vaj ulliri", "Oregano dhe biber sipas shijes"
+    ],
+    image: require("../assets/images/vegpizza.jpg"),
+    instructions: "Për të bërë një picë vegjetariane, fillimisht përgatitni brumin e picës...🍕 Shijojeni picën tuaj vegjetariane! 😊"
   },
 ];
 
 const SAVED_RECIPES_KEY = '@saved_recipes';
+
+// Fjalor për përkthimin e përbërësve nga shqip në anglisht
+const ingredientTranslations: Record<string, string> = {
+  'domate': 'tomato',
+  'djathe': 'cheese',
+  'qepe': 'onion',
+  'hudher': 'garlic',
+  'spec i kuq': 'red pepper',
+  'spec i gjelbër': 'green pepper',
+  'vaj ulliri': 'olive oil',
+  'kerpudha': 'mushroom',
+  'patate': 'potato',
+  'pule': 'chicken',
+  'peshk': 'fish',
+  'miser': 'corn',
+  'spinaq': 'spinach',
+  'veze': 'egg',
+  'qumesht': 'milk',
+  'kos': 'yogurt',
+  'oriz': 'rice',
+  'fasule': 'beans',
+  'patellxhan': 'eggplant',
+  'kungull': 'pumpkin',
+  'lulelakër': 'cauliflower',
+  'karrote': 'carrot',
+  'trangull': 'cucumber',
+  'limon': 'lemon',
+  'borzilok': 'parsley',
+  'majdanoz': 'parsley',
+  'rigon': 'dill',
+  'selino': 'celery',
+  'kripe': 'salt',
+  'piper': 'pepper',
+  'biber': 'pepper',
+  'oregano': 'oregano',
+  'bazilik': 'basil',
+  'rrushi': 'grape',
+  'ullinj': 'olives',
+};
+
+// Funksioni për përkthimin e tekstit në shqip
+const translateText = async (text: string): Promise<string> => {
+  try {
+    const response = await axios.get('https://api.mymemory.translated.net/get', {
+      params: {
+        q: text,
+        langpair: 'en|sq'
+      }
+    });
+    return response.data.responseData.translatedText || text;
+  } catch (error) {
+    console.error('Translation error:', error);
+    return text;
+  }
+};
+
+// Funksioni i përditësuar për kërkimin e recetave nga API
+const searchRecipesByIngredients = async (ingredients: string[]): Promise<Recipe[]> => {
+  try {
+    // Përkthe përbërësit në anglisht për kërkim
+    const translatedIngredients = ingredients.map(ingredient =>
+      ingredientTranslations[ingredient.toLowerCase()] || ingredient
+    );
+
+    // Kërko receta për çdo përbërës individualisht
+    const recipesByIngredient: { [key: string]: any[] } = {};
+
+    for (const ingredient of translatedIngredients) {
+      const response = await fetch(`https://www.themealdb.com/api/json/v1/1/filter.php?i=${encodeURIComponent(ingredient)}`);
+      const data = await response.json();
+      if (data.meals) {
+        recipesByIngredient[ingredient] = data.meals;
+      } else {
+        recipesByIngredient[ingredient] = [];
+      }
+    }
+
+    // Gjej ID-të e recetave që përmbajnë të gjithë përbërësit
+    const allRecipeIds = Object.values(recipesByIngredient).flat().map(meal => meal.idMeal);
+    const recipeCounts: { [key: string]: number } = {};
+
+    allRecipeIds.forEach(id => {
+      recipeCounts[id] = (recipeCounts[id] || 0) + 1;
+    });
+
+    const matchingRecipeIds = Object.keys(recipeCounts)
+      .filter(id => recipeCounts[id] === ingredients.length)
+      .filter((value, index, self) => self.indexOf(value) === index);
+
+    // Merr detajet e recetave që përputhen
+    const detailedRecipes: Recipe[] = [];
+
+    for (const recipeId of matchingRecipeIds) {
+      const detailResponse = await fetch(`https://www.themealdb.com/api/json/v1/1/lookup.php?i=${recipeId}`);
+      const detailData = await detailResponse.json();
+
+      if (detailData.meals && detailData.meals.length > 0) {
+        const mealDetails = detailData.meals[0];
+
+        const ingredientsList: string[] = [];
+        for (let i = 1; i <= 20; i++) {
+          const ingredient = mealDetails[`strIngredient${i}`];
+          const measure = mealDetails[`strMeasure${i}`];
+
+          if (ingredient && ingredient.trim() !== '') {
+            ingredientsList.push(`${measure ? measure.trim() + ' ' : ''}${ingredient.trim()}`);
+          }
+        }
+
+        detailedRecipes.push({
+          id: mealDetails.idMeal,
+          name: mealDetails.strMeal,
+          ingredients: ingredientsList,
+          image: { uri: mealDetails.strMealThumb },
+          instructions: mealDetails.strInstructions || 'No instructions provided'
+        });
+      }
+    }
+
+    return detailedRecipes;
+  } catch (error) {
+    console.error('Error fetching recipes:', error);
+    return [];
+  }
+};
 
 export default function App() {
   const [fontsLoaded, fontError] = useFonts({ Satisfy: Satisfy_400Regular });
@@ -84,8 +181,9 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredRecipes, setFilteredRecipes] = useState<Recipe[]>([]);
   const [hasSearched, setHasSearched] = useState(false);
-  const [savedRecipes, setSavedRecipes] = useState<string[]>([]);
+  const [savedRecipeIds, setSavedRecipeIds] = useState<string[]>([]);
   const [isLoadingStorage, setIsLoadingStorage] = useState(true);
+  const [isSearching, setIsSearching] = useState(false);
   const router = useRouter();
 
   useEffect(() => {
@@ -93,10 +191,15 @@ export default function App() {
       setIsLoadingStorage(true);
       try {
         const storedValue = await AsyncStorage.getItem(SAVED_RECIPES_KEY);
-        setSavedRecipes(storedValue ? JSON.parse(storedValue) : []);
+        if (storedValue) {
+          const savedRecipes: Recipe[] = JSON.parse(storedValue);
+          setSavedRecipeIds(savedRecipes.map(recipe => recipe.id));
+        } else {
+          setSavedRecipeIds([]);
+        }
       } catch (e) {
         console.error("Failed to load saved recipes", e);
-        setSavedRecipes([]);
+        setSavedRecipeIds([]);
       } finally {
         setIsLoadingStorage(false);
       }
@@ -104,44 +207,62 @@ export default function App() {
     loadSavedRecipes();
   }, []);
 
-  const toggleSavedRecipe = async (recipeId: string) => {
-    const isCurrentlySaved = savedRecipes.includes(recipeId);
-    let newSavedRecipes: string[];
-    
-    if (isCurrentlySaved) {
-      newSavedRecipes = savedRecipes.filter(id => id !== recipeId);
-      if (router.pathname === '/my-recipes') {
-        setFilteredRecipes(prev => prev.filter(recipe => recipe.id !== recipeId));
-      }
-    } else {
-      newSavedRecipes = [...savedRecipes, recipeId];
-    }
-
-    setSavedRecipes(newSavedRecipes);
-    
+  const toggleSavedRecipe = async (recipe: Recipe) => {
     try {
-      await AsyncStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(newSavedRecipes));
+      const storedValue = await AsyncStorage.getItem(SAVED_RECIPES_KEY);
+      let savedRecipes: Recipe[] = storedValue ? JSON.parse(storedValue) : [];
+
+      const isCurrentlySaved = savedRecipes.some(r => r.id === recipe.id);
+      let newSavedRecipes: Recipe[];
+
+      if (isCurrentlySaved) {
+        newSavedRecipes = savedRecipes.filter(r => r.id !== recipe.id);
+      } else {
+        newSavedRecipes = [...savedRecipes, recipe];
+      }
+
+      setSavedRecipeIds(newSavedRecipes.map(r => r.id));
+
+      try {
+        await AsyncStorage.setItem(SAVED_RECIPES_KEY, JSON.stringify(newSavedRecipes));
+      } catch (e) {
+        console.error("Failed to save recipes", e);
+        setSavedRecipeIds(savedRecipes.map(r => r.id));
+      }
     } catch (e) {
-      console.error("Failed to save recipes", e);
-      setSavedRecipes(savedRecipes);
+      console.error("Failed to load/save recipes", e);
     }
   };
 
-  const handleSearch = () => {
+  const handleSearch = async () => {
     setHasSearched(true);
+    setIsSearching(true);
+
     if (searchQuery.trim() === "") {
       setFilteredRecipes([]);
-    } else {
-      const searchTerms = searchQuery.toLowerCase().split(' ').filter(term => term);
-      const filtered = exampleRecipes.filter((recipe) =>
-        searchTerms.some(term =>
-          recipe.name.toLowerCase().includes(term) ||
+      setIsSearching(false);
+      return;
+    }
+
+    const searchTerms = searchQuery.toLowerCase().split(',').map(term => term.trim()).filter(term => term);
+
+    try {
+      const apiRecipes = await searchRecipesByIngredients(searchTerms);
+
+      // Filtrim i recetave lokale që përmbajnë të gjithë përbërësit
+      const localRecipes = exampleRecipes.filter(recipe =>
+        searchTerms.every(term =>
           recipe.ingredients.some(ingredient =>
             ingredient.toLowerCase().includes(term)
           )
-        )
-      );
-      setFilteredRecipes(filtered);
+        ));
+
+      setFilteredRecipes([...apiRecipes, ...localRecipes]);
+    } catch (error) {
+      console.error('Search error:', error);
+      setFilteredRecipes([]);
+    } finally {
+      setIsSearching(false);
     }
   };
 
@@ -159,8 +280,8 @@ export default function App() {
       <RecipeDetail
         recipe={selectedRecipe}
         onBack={() => setSelectedRecipe(null)}
-        toggleSavedRecipe={toggleSavedRecipe}
-        isSaved={savedRecipes.includes(selectedRecipe.id)}
+        toggleSavedRecipe={() => toggleSavedRecipe(selectedRecipe)}
+        isSaved={savedRecipeIds.includes(selectedRecipe.id)}
       />
     );
   }
@@ -175,8 +296,9 @@ export default function App() {
       setFilteredRecipes={setFilteredRecipes}
       hasSearched={hasSearched}
       setHasSearched={setHasSearched}
-      savedRecipes={savedRecipes}
+      savedRecipeIds={savedRecipeIds}
       toggleSavedRecipe={toggleSavedRecipe}
+      isSearching={isSearching}
     />
   );
 }
@@ -190,8 +312,9 @@ interface HomePageProps {
   setFilteredRecipes: (recipes: Recipe[]) => void;
   hasSearched: boolean;
   setHasSearched: (value: boolean) => void;
-  savedRecipes: string[];
-  toggleSavedRecipe: (recipeId: string) => void;
+  savedRecipeIds: string[];
+  toggleSavedRecipe: (recipe: Recipe) => void;
+  isSearching: boolean;
 }
 
 function HomePage({
@@ -203,8 +326,9 @@ function HomePage({
   setFilteredRecipes,
   hasSearched,
   setHasSearched,
-  savedRecipes,
-  toggleSavedRecipe
+  savedRecipeIds,
+  toggleSavedRecipe,
+  isSearching
 }: HomePageProps) {
   const searchInputRef = useRef<TextInput>(null);
   const fadeAnim = useRef(new Animated.Value(1)).current;
@@ -239,7 +363,7 @@ function HomePage({
             <Ionicons name="search" size={20} color="#888" style={styles.searchIcon} />
             <TextInput
               ref={searchInputRef}
-              placeholder="Kërko receta me përbërës..."
+              placeholder="Shkruani përbërësit (ndarë me presje)..."
               placeholderTextColor="#888"
               value={searchQuery}
               onChangeText={setSearchQuery}
@@ -264,9 +388,35 @@ function HomePage({
           </View>
         </View>
 
+        {!hasSearched && searchQuery.length > 0 && (
+          <View style={styles.suggestionsContainer}>
+            {Object.keys(ingredientTranslations)
+              .filter(ing => ing.includes(searchQuery.toLowerCase()))
+              .slice(0, 5)
+              .map((ingredient, index) => (
+                <TouchableOpacity
+                  key={index}
+                  style={styles.suggestionItem}
+                  onPress={() => {
+                    setSearchQuery(
+                      searchQuery ? `${searchQuery}, ${ingredient}` : ingredient
+                    );
+                  }}
+                >
+                  <Text style={styles.suggestionText}>{ingredient}</Text>
+                </TouchableOpacity>
+              ))}
+          </View>
+        )}
+
         {hasSearched && (
           <>
-            {filteredRecipes.length > 0 ? (
+            {isSearching ? (
+              <View style={styles.loadingContainer}>
+                <ActivityIndicator size="large" color="#007AFF" />
+                <Text style={styles.loadingText}>Duke kërkuar receta...</Text>
+              </View>
+            ) : filteredRecipes.length > 0 ? (
               <FlatList
                 data={filteredRecipes}
                 keyExtractor={(item) => item.id}
@@ -280,7 +430,7 @@ function HomePage({
                     activeOpacity={0.8}
                   >
                     <ImageBackground
-                      source={item.image}
+                      source={typeof item.image === 'number' ? item.image : { uri: item.image.uri }}
                       style={styles.recipeImage}
                       imageStyle={styles.imageStyle}
                     >
@@ -288,13 +438,13 @@ function HomePage({
                         style={styles.heartButton}
                         onPress={(e) => {
                           e.stopPropagation();
-                          toggleSavedRecipe(item.id);
+                          toggleSavedRecipe(item);
                         }}
                       >
                         <Ionicons
-                          name={savedRecipes.includes(item.id) ? "heart" : "heart-outline"}
+                          name={savedRecipeIds.includes(item.id) ? "heart" : "heart-outline"}
                           size={24}
-                          color={savedRecipes.includes(item.id) ? "red" : "white"}
+                          color={savedRecipeIds.includes(item.id) ? "red" : "white"}
                         />
                       </TouchableOpacity>
                       <View style={styles.imageOverlay}>
@@ -322,11 +472,45 @@ function HomePage({
 interface RecipeDetailProps {
   recipe: Recipe;
   onBack: () => void;
-  toggleSavedRecipe: (recipeId: string) => void;
+  toggleSavedRecipe: () => void;
   isSaved: boolean;
 }
 
 function RecipeDetail({ recipe, onBack, toggleSavedRecipe, isSaved }: RecipeDetailProps) {
+  const [translatedRecipe, setTranslatedRecipe] = useState<{
+    name?: string;
+    ingredients?: string[];
+    instructions?: string;
+  }>({});
+  const [isTranslating, setIsTranslating] = useState(false);
+
+  const translateRecipe = async () => {
+    setIsTranslating(true);
+    try {
+      // Përkthe emrin
+      const nameTranslated = await translateText(recipe.name);
+
+      // Përkthe përbërësit
+      const ingredientsTranslated = await Promise.all(
+        recipe.ingredients.map(ing => translateText(ing))
+      );
+
+      // Përkthe udhëzimet
+      const instructionsTranslated = await translateText(recipe.instructions);
+
+      setTranslatedRecipe({
+        name: nameTranslated,
+        ingredients: ingredientsTranslated,
+        instructions: instructionsTranslated
+      });
+    } catch (error) {
+      console.error('Translation error:', error);
+      Alert.alert('Gabim', 'Përkthimi dështoi');
+    } finally {
+      setIsTranslating(false);
+    }
+  };
+
   return (
     <ImageBackground source={require("../assets/images/recipedd.jpg")} style={styles.bbackground} resizeMode="cover">
       <View style={styles.backgroundOverlay} />
@@ -336,10 +520,10 @@ function RecipeDetail({ recipe, onBack, toggleSavedRecipe, isSaved }: RecipeDeta
             <Ionicons name="arrow-back" size={24} color="#333" />
           </TouchableOpacity>
           <Text style={styles.detailTitle} numberOfLines={1} ellipsizeMode='tail'>
-            {recipe.name}
+            {translatedRecipe.name || recipe.name}
           </Text>
           <TouchableOpacity
-            onPress={() => toggleSavedRecipe(recipe.id)}
+            onPress={toggleSavedRecipe}
             style={styles.detailHeartButton}
           >
             <Ionicons
@@ -350,14 +534,25 @@ function RecipeDetail({ recipe, onBack, toggleSavedRecipe, isSaved }: RecipeDeta
           </TouchableOpacity>
         </View>
 
+        <TouchableOpacity
+          onPress={translateRecipe}
+          style={styles.translateButton}
+          disabled={isTranslating}
+        >
+          <Ionicons name="language" size={20} color="#007AFF" />
+          <Text style={styles.translateText}>
+            {isTranslating ? 'Po përkthehet...' : 'Përkthe në shqip'}
+          </Text>
+        </TouchableOpacity>
+
         <View style={styles.detailTopRowContainer}>
           <View style={styles.detailImageContainer}>
-            <Image source={recipe.image} style={styles.detailImage} resizeMode="cover"/>
+            <Image source={recipe.image} style={styles.detailImage} resizeMode="cover" />
           </View>
           <View style={styles.detailIngredientsContainer}>
             <View style={styles.section}>
               <Text style={styles.sectionTitle}>Përbërësit</Text>
-              {recipe.ingredients.map((ingredient, index) => (
+              {(translatedRecipe.ingredients || recipe.ingredients).map((ingredient, index) => (
                 <View key={index} style={styles.ingredientItem}>
                   <Ionicons name="ellipse" size={8} color="#007AFF" style={styles.ingredientIcon} />
                   <Text style={styles.ingredientText}>{ingredient}</Text>
@@ -370,7 +565,9 @@ function RecipeDetail({ recipe, onBack, toggleSavedRecipe, isSaved }: RecipeDeta
         <View style={styles.detailInstructionsContainer}>
           <View style={styles.section}>
             <Text style={styles.sectionTitle}>Udhëzimet</Text>
-            <Text style={styles.instructionsText}>{recipe.instructions}</Text>
+            <Text style={styles.instructionsText}>
+              {translatedRecipe.instructions || recipe.instructions}
+            </Text>
           </View>
         </View>
       </ScrollView>
@@ -380,9 +577,9 @@ function RecipeDetail({ recipe, onBack, toggleSavedRecipe, isSaved }: RecipeDeta
 
 // ======== STILET ========
 const styles = StyleSheet.create({
-  bbackground: { 
-    flex: 1, 
-    width: "100%" 
+  bbackground: {
+    flex: 1,
+    width: "100%"
   },
   backgroundOverlay: {
     position: 'absolute',
@@ -514,26 +711,37 @@ const styles = StyleSheet.create({
     color: '#444',
     lineHeight: isMobile ? 22 : 24
   },
-
-
-  background: { flex: 1, width: "100%"},
+  translateButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: 'rgba(255,255,255,0.8)',
+    padding: 10,
+    borderRadius: 20,
+    marginHorizontal: 15,
+    marginBottom: 15,
+    alignSelf: 'flex-start',
+  },
+  translateText: {
+    marginLeft: 5,
+    color: '#007AFF',
+    fontWeight: '500',
+  },
+  background: { flex: 1, width: "100%" },
   container: {
-    flex: 1, // Lejon KeyboardAvoidingView të funksionojë mirë
-    padding: isMobile ? 15 : 30, // Reduktuar pak padding
+    flex: 1,
+    padding: isMobile ? 15 : 30,
     maxWidth: 1200,
     alignSelf: 'center',
     width: '100%',
-    // alignItems: 'center', // Heqim këtë pasi FlatList tani ka width 100%
   },
-  headerContainer: { // Vetëm kur !hasSearched
+  headerContainer: {
     width: '100%',
     alignItems: 'center',
-    paddingTop: isMobile ? 150 : 80, // Zvogëluar pak paddingTop
+    paddingTop: isMobile ? 150 : 80,
     marginBottom: 20,
     maxWidth: 1200,
     alignSelf: 'center',
   },
-  // headerContainerSmall HIQET PLOTËSISHT
   appTitle: {
     fontSize: isMobile ? 35 : 42,
     fontWeight: 'bold',
@@ -550,18 +758,18 @@ const styles = StyleSheet.create({
     textAlign: 'center',
     paddingTop: 10,
   },
-  searchContainer: { // Fillestar
+  searchContainer: {
     marginBottom: 20,
-    paddingTop: 10, // Zvogëluar padding top
-    paddingBottom: 10, // Zvogëluar padding bottom
+    paddingTop: 10,
+    paddingBottom: 10,
     width: '100%',
     maxWidth: 800,
     alignSelf: 'center',
-    paddingHorizontal: isMobile ? 15 : 100, // Reduktuar pak padding horizontal
+    paddingHorizontal: isMobile ? 15 : 100,
   },
-  searchContainerSmall: { // Kur ka rezultate
-    marginBottom: 15, // Pak më shumë hapësirë poshtë search bar
-    paddingTop: 15, // Pak padding sipër search bar
+  searchContainerSmall: {
+    marginBottom: 15,
+    paddingTop: 15,
     paddingBottom: 10,
     paddingHorizontal: isMobile ? 15 : 100,
   },
@@ -594,21 +802,42 @@ const styles = StyleSheet.create({
     padding: 8,
     marginLeft: 5,
   },
-  clearButton: { // Stili për butonin X
+  clearButton: {
     padding: 5,
     marginRight: 5,
   },
-
-  flatListContent: { // Stil për vetë FlatList
-    flex: 1, // Lejon FlatList të zgjerohet
-    width: '100%', // Zë gjithë gjerësinë e container
+  suggestionsContainer: {
+    backgroundColor: 'white',
+    borderRadius: 10,
+    marginTop: 5,
+    padding: 10,
+    width: '90%',
+    alignSelf: 'center',
+    shadowColor: "#000",
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
   },
-  columnWrapper: { // Rreshton kartat brenda një rreshti
+  suggestionItem: {
+    paddingVertical: 8,
+    borderBottomWidth: 1,
+    borderBottomColor: '#eee',
+  },
+  suggestionText: {
+    fontSize: 16,
+    color: '#333',
+  },
+  flatListContent: {
+    flex: 1,
+    width: '100%',
+  },
+  columnWrapper: {
     gap: isMobile ? 10 : 15,
     marginBottom: isMobile ? 10 : 15,
   },
-  recipeCard: { // Stili për secilën kartë
-    width: isMobile ? '48%' : '23.5%', // Rregulluar pak gjerësia desktop
+  recipeCard: {
+    width: isMobile ? '48%' : '23.5%',
     aspectRatio: 1,
     backgroundColor: "white",
     borderRadius: 12,
@@ -633,14 +862,14 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.5)',
     paddingHorizontal: isMobile ? 10 : 12,
     paddingVertical: isMobile ? 8 : 10,
-    height: 90, // Lartësi minimale për overlay
+    height: 90,
     paddingBottom: 8
   },
   recipeName: {
     fontSize: isMobile ? 15 : 17,
     fontWeight: "bold",
     color: "white",
-    marginBottom: 8, // Hapësirë e vogël para footer
+    marginBottom: 8,
   },
   recipeFooter: {
     flexDirection: 'row',
@@ -654,38 +883,37 @@ const styles = StyleSheet.create({
   },
   noResults: {
     textAlign: "center",
-    marginTop: 40, // Më shumë hapësirë sipër
+    marginTop: 40,
     fontSize: 17,
-    color: "#666", // Pak më e errët
+    color: "#666",
   },
   heartButton: {
     position: 'absolute',
-    top: 8, // Pak më poshtë
+    top: 8,
     right: 8,
-    backgroundColor: 'rgba(0,0,0,0.4)', // Pak më transparent
+    backgroundColor: 'rgba(0,0,0,0.4)',
     borderRadius: 20,
-    padding: 6, // Pak më shumë padding
+    padding: 6,
   },
-  listContentPadding: { // Padding vetëm poshtë listës
-    paddingBottom: 30, // Më shumë hapësirë poshtë
+  listContentPadding: {
+    paddingBottom: 30,
   },
-
-  loadingContainer: { // Stili për containerin loading
-     flex: 1,
-     justifyContent: 'center',
-     alignItems: 'center',
-     backgroundColor: '#f0f0f0',
+  loadingContainer: {
+    flex: 1,
+    justifyContent: 'center',
+    alignItems: 'center',
+    backgroundColor: '#f0f0f0',
   },
-  loadingText: { // Teksti Loading...
-     marginTop: 10,
-     fontSize: 16,
-     color: '#555',
+  loadingText: {
+    marginTop: 10,
+    fontSize: 16,
+    color: '#555',
   },
-  errorText: { // Teksti Error
-     fontSize: 16,
-     color: 'red',
+  errorText: {
+    fontSize: 16,
+    color: 'red',
   },
-    detailHeartButton: {
+  detailHeartButton: {
     position: 'absolute',
     right: 15,
     top: Platform.OS === 'ios' ? 50 : 40,
