@@ -1,0 +1,13 @@
+{
+  "name": "reverse-shopping-backend",
+  "version": "1.0.0",
+  "description": "Backend API for Reverse Shopping app",
+  "main": "simpleApi.js",
+  "scripts": {
+    "start": "node simpleApi.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "cors": "^2.8.5"
+  }
+}

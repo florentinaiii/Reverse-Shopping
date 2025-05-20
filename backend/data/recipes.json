@@ -1,0 +1,430 @@
+{
+  "recipes": [
+    {
+      "id": "1",
+      "name": "Tavë Kosi",
+      "ingredients": [
+        "1 kg mish qengji",
+        "500g oriz",
+        "1 kg kos",
+        "4 vezë",
+        "100g gjalpë",
+        "Kripë",
+        "Piper i zi"
+      ],
+      "instructions": "1. Vendosni mishin e qengjit në tavë dhe piqeni në furrë për 30 minuta në 180°C.\n2. Shtoni orizin dhe ujin e nevojshëm.\n3. Në një enë tjetër, përzieni kosin me vezët, kripën dhe piperin.\n4. Hidhni përzierjen e kosit mbi mish.\n5. Vendosni copëza gjalpi sipër.\n6. Piqeni në furrë për 45 minuta në 180°C derisa të marrë ngjyrë të artë.",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/6/66/Tav%C3%AB_Kosi_01.jpg"
+    },
+    {
+      "id": "2",
+      "name": "Byrek me Spinaq",
+      "ingredients": [
+        "500g petë byrek",
+        "700g spinaq",
+        "2 qepë",
+        "Vaj ulliri",
+        "Kripë",
+        "Piper i zi"
+      ],
+      "instructions": "1. Pastroni dhe lani spinaqin.\n2. Kaurdisni qepët në vaj ulliri.\n3. Shtoni spinaqin dhe erëzat.\n4. Vendosni petët në tepsi duke i spërkatur me vaj.\n5. Shtroni mbushjen e spinaqit.\n6. Piqeni në furrë për 30-35 minuta në 180°C.",
+      "image": "http://localhost:3008/assets/images/recipedd.jpg"
+    },
+    {
+      "id": "3",
+      "name": "Fërgesë Tirane",
+      "ingredients": [
+        "500g djathë i bardhë",
+        "4 speca të gjelbër",
+        "4 domate",
+        "2 qepë",
+        "Vaj ulliri",
+        "Kripë",
+        "Piper"
+      ],
+      "instructions": "1. Prisni qepët, specat dhe domatet.\n2. Kaurdisni qepët në vaj ulliri.\n3. Shtoni specat dhe domatet.\n4. Shtoni djathin e copëtuar.\n5. Zieni në zjarr të ulët derisa të tretet djathi.",
+      "image": "http://localhost:3008/assets/images/recipedd.jpg"
+    },
+    {
+      "id": "4",
+      "name": "Qofte të Fërguara",
+      "ingredients": [
+        "500g mish i grirë",
+        "2 qepë",
+        "2 feta bukë",
+        "2 vezë",
+        "Majdanoz",
+        "Kripë",
+        "Piper",
+        "Rigon"
+      ],
+      "instructions": "1. Grini qepët imët.\n2. Përzieni mishin me qepët, bukën e njomur, vezët dhe erëzat.\n3. Formoni qoftet.\n4. Piqini në tigan ose skarë.",
+      "image": "http://localhost:3008/assets/images/recipedd.jpg"
+    },
+    {
+      "id": "5",
+      "name": "Pilaf me Mish Pule",
+      "ingredients": [
+        "500g oriz",
+        "400g mish pule",
+        "2 qepë",
+        "2 karota",
+        "Vaj ulliri",
+        "Kripë",
+        "Piper"
+      ],
+      "instructions": "1. Skuqni mishin e pulës të prerë në kuba.\n2. Kaurdisni qepët dhe karotat.\n3. Shtoni orizin dhe ujin.\n4. Zieni derisa orizi të jetë gati.",
+      "image": "http://localhost:3008/assets/images/pilafpule.jpg"
+    },
+    {
+      "id": "6",
+      "name": "Lakror me Presh",
+      "ingredients": [
+        "500g petë byrek",
+        "1 kg presh",
+        "Vaj ulliri",
+        "Kripë",
+        "Piper"
+      ],
+      "instructions": "1. Pastroni dhe prisni preshin hollë.\n2. Kaurdisni preshin me erëza.\n3. Vendosni petët në tepsi.\n4. Shtroni mbushjen e preshit.\n5. Piqeni në furrë për 30-35 minuta.",
+      "image": "http://localhost:3008/assets/images/recipedd.jpg"
+    },
+    {
+      "id": "7",
+      "name": "Patëllxhanë të Mbushur",
+      "ingredients": [
+        "6 patëllxhanë",
+        "400g mish i grirë",
+        "2 qepë",
+        "2 domate",
+        "Majdanoz",
+        "Kripë",
+        "Piper"
+      ],
+      "instructions": "1. Pritini patëllxhanët përgjysmë.\n2. Skuqni mishin me qepë.\n3. Mbushni patëllxhanët me përzierjen e mishit.\n4. Piqini në furrë për 30 minuta.",
+      "image": "http://localhost:3008/assets/images/recipedd.jpg"
+    },
+    {
+      "id": "8",
+      "name": "Fasule në Tavë",
+      "ingredients": [
+        "500g fasule",
+        "2 qepë",
+        "2 karota",
+        "2 domate",
+        "Vaj ulliri",
+        "Kripë",
+        "Piper",
+        "Rigon"
+      ],
+      "instructions": "1. Zieni fasulet paraprakisht.\n2. Përgatisni salcën me qepë, karota dhe domate.\n3. Kombinoni fasulet me salcën.\n4. Piqeni në furrë për 30 minuta.",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/4/4b/Fasule_shqiptare.jpg"
+    },
+    {
+      "id": "9",
+      "name": "Petulla",
+      "ingredients": [
+        "500g miell",
+        "2 vezë",
+        "250ml qumësht",
+        "1 lugë maja",
+        "Kripë",
+        "Sheqer",
+        "Vaj për skuqje"
+      ],
+      "instructions": "1. Përzieni miellin, vezët, qumështin dhe majën.\n2. Lini brumin të pushojë për 30 minuta.\n3. Formoni dhe skuqni petullat në vaj të nxehtë.",
+      "image": "https://upload.wikimedia.org/wikipedia/commons/7/74/Petulla_albaniane.jpg"
+    },
+    {
+      "id": "10",
+      "name": "Trileçe",
+      "ingredients": [
+        "6 vezë",
+        "200g sheqer",
+        "200g miell",
+        "500ml qumësht",
+        "200ml krem qumështi",
+        "200ml qumësht i kondensuar",
+        "Karamel për sipër"
+      ],
+      "instructions": "1. Përgatisni pandispanjën me vezë, sheqer dhe miell.\n2. Piqeni për 25 minuta në 180°C.\n3. Përzieni tre llojet e qumështit.\n4. Hidhini mbi pandispanjë.\n5. Zbukurojeni me karamel.",
+      "image": "http://localhost:3008/assets/images/tiramisu.jpg"
+    },
+        {
+          "id": "11",
+          "name": "Kavarma",
+          "ingredients": [
+            "600g mish qengji",
+            "2 qepë",
+            "2 speca",
+            "3 domate",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Kaurdisni qepët dhe specat në vaj ulliri.\n2. Shtoni mishin e prerë në copa dhe skuqeni.\n3. Shtoni domatet e prera dhe erëzat.\n4. Gatuani në zjarr të ngadaltë për 45 minuta.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/9/9b/Kavarma.jpg"
+        },
+        {
+          "id": "12",
+          "name": "Suxhuk i Skuqur",
+          "ingredients": [
+            "200g suxhuk",
+            "Vaj ulliri"
+          ],
+          "instructions": "1. Prisni suxhukun në feta.\n2. Skuqni fetat në vaj ulliri derisa të jenë krokante.\n3. Shërbejeni me bukë të freskët.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "13",
+          "name": "Jani me Fasule",
+          "ingredients": [
+            "500g fasule e bardhë",
+            "2 qepë",
+            "2 karota",
+            "2 domate",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Zieni fasulet në ujë me kripë.\n2. Në një tenxhere tjetër, kaurdisni qepët, karotat dhe domatet.\n3. Shtoni fasulet dhe lërini të ziejnë bashkë për 30 minuta.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/6/62/Beans_Soup.jpg"
+        },
+        {
+          "id": "14",
+          "name": "Gjellë me Patate",
+          "ingredients": [
+            "4 patate mesatare",
+            "2 qepë",
+            "2 domate",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Prisni patatet në kubikë.\n2. Kaurdisni qepët dhe domatet.\n3. Shtoni patatet dhe ujin.\n4. Gatuani derisa patatet të zbuten.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "15",
+          "name": "Bakllava",
+          "ingredients": [
+            "500g petë byrek",
+            "400g arra të thërrmuara",
+            "250g gjalpë",
+            "300g sheqer",
+            "200ml ujë",
+            "Lëng limoni"
+          ],
+          "instructions": "1. Lyeni tepsinë me gjalpë dhe vendosni petët duke i lyer me gjalpë njërën pas tjetrës.\n2. Shtoni arra në mes.\n3. Piqeni në 180°C për 45 minuta.\n4. Përgatisni sherbetin me sheqer, ujë dhe limon.\n5. Hidhni sherbetin mbi bakllava të ngrohtë.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/e/e5/Baklava_1.jpg"
+        },
+        {
+          "id": "16",
+          "name": "Qebapa",
+          "ingredients": [
+            "1 kg mish i grirë (lamë dhe viç)",
+            "Kripë",
+            "Piper",
+            "Rigon",
+            "Hudhër pluhur"
+          ],
+          "instructions": "1. Përzieni mishin me erëzat.\n2. Formoni qebapat në formë të gjatë.\n3. Piqini në skarë ose tigan derisa të jenë gati.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "17",
+          "name": "Sallatë Meze",
+          "ingredients": [
+            "Domate",
+            "Kastraot",
+            "Qepë e kuqe",
+            "Speca",
+            "Djathë i bardhë",
+            "Vaj ulliri",
+            "Kripë",
+            "Uthull"
+          ],
+          "instructions": "1. Prisni të gjitha perimet në copa.\n2. Përzieni me vaj ulliri, kripë dhe uthull.\n3. Shtoni djathin e bardhë sipër dhe shërbejeni.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/2/23/Greek_Salad_01.jpg"
+        },
+        {
+          "id": "18",
+          "name": "Shëndetli me Patate",
+          "ingredients": [
+            "500g mish i grirë",
+            "4 patate",
+            "2 qepë",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Skuqni mishin me qepë.\n2. Prisni patatet në feta të holla.\n3. Në një tepsi, shtrojeni mishin dhe mbulojeni me patate.\n4. Piqeni në furrë në 180°C për 40 minuta.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "19",
+          "name": "Rizoto me Kërpudha",
+          "ingredients": [
+            "400g oriz për rizoto",
+            "200g kërpudha",
+            "1 qepë",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Kaurdisni qepën dhe kërpudhat.\n2. Shtoni orizin dhe përziejini.\n3. Shtoni ujë gradualisht dhe ziejeni derisa orizi të jetë gati.",
+          "image": "https://upload.wikimedia.org/wikipedia/commons/4/4f/Mushroom_risotto_%282%29.jpg"
+        },
+        {
+          "id": "20",
+          "name": "Supa me Pule dhe Nokedha",
+          "ingredients": [
+            "500g mish pule",
+            "2 karota",
+            "2 qepë",
+            "Nokedha (miell, vezë, kripë)",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Zieni mishin e pulës me karotat dhe qepët.\n2. Përgatisni nokedhat dhe hidhini në supë.\n3. Zieni edhe pak derisa të gatuhen nokedhat.",
+          "image": "http://localhost:3008/assets/images/supe.jpg"
+        },
+        {
+          "id": "21",
+          "name": "Sallatë Shqiptare",
+          "ingredients": [
+            "Domate",
+            "Kastraot",
+            "Qepë",
+            "Speca",
+            "Vaj ulliri",
+            "Kripë"
+          ],
+          "instructions": "1. Prisni të gjitha perimet në copa.\n2. Përzieni me vaj ulliri dhe kripë.\n3. Shërbejeni të freskët.",
+          "image": "http://localhost:3008/assets/images/chickensalad.jpg"
+        },
+        {
+          "id": "22",
+          "name": "Tavë Dheu",
+          "ingredients": [
+            "600g mish qengji",
+            "Patate",
+            "Qepë",
+            "Domate",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Kaurdisni mishin me qepë.\n2. Shtoni domatet dhe patatet në copa.\n3. Vendosni gjithçka në tave dhe piqeni në furrë për 1 orë.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "23",
+          "name": "Gjellë me Mish Viçi dhe Perime",
+          "ingredients": [
+            "500g mish viçi",
+            "Qepë",
+            "Speca",
+            "Domate",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Kaurdisni mishin me qepë.\n2. Shtoni specat dhe domatet.\n3. Gatuani në zjarr të ngadaltë derisa të zbutet mishi.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "24",
+          "name": "Byrek me Qepë",
+          "ingredients": [
+            "500g petë byrek",
+            "500g qepë",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Kaurdisni qepët në vaj ulliri deri sa të zbuten.\n2. Shtroni petët në tepsi.\n3. Vendosni mbushjen e qepëve.\n4. Piqeni në furrë për 30-35 minuta.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "25",
+          "name": "Petulla me Kos",
+          "ingredients": [
+            "500g miell",
+            "200ml kos",
+            "2 vezë",
+            "Kripë",
+            "Vaj për skuqje"
+          ],
+          "instructions": "1. Përzieni miellin me vezët dhe kosin.\n2. Formoni petullat dhe skuqini në vaj të nxehtë.\n3. Shërbejeni me mjaltë ose kos.",
+          "image": "http://localhost:3008/assets/images/biscuits.jpg"
+        },
+        {
+          "id": "26",
+          "name": "Lakror me mish",
+          "ingredients": [
+            "Petë për lakror",
+            "500g mish i grirë",
+            "Qepë",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Përzieni mishin me qepën dhe erëzat.\n2. Shtroni petët dhe vendosni mbushjen.\n3. Piqeni në furrë në 180°C për 45 minuta.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "27",
+          "name": "Fërgesë me Speca dhe Domate",
+          "ingredients": [
+            "Speca të kuq",
+            "Domate",
+            "Qepë",
+            "Djathë i bardhë",
+            "Vaj ulliri",
+            "Kripë"
+          ],
+          "instructions": "1. Kaurdisni qepët, specat dhe domatet.\n2. Shtoni djathin dhe lërini të shkrihet.\n3. Shërbejeni të ngrohtë.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "28",
+          "name": "Petulla të Kripura",
+          "ingredients": [
+            "500g miell",
+            "200ml ujë",
+            "Kripë",
+            "Vaj për skuqje"
+          ],
+          "instructions": "1. Përzieni miellin, ujin dhe kripën.\n2. Formoni petullat dhe skuqini në vaj të nxehtë.\n3. Shërbejeni të ngrohta.",
+          "image": "http://localhost:3008/assets/images/biscuits.jpg"
+        },
+        {
+          "id": "29",
+          "name": "Gjellë me Patëllxhan",
+          "ingredients": [
+            "2 patëllxhanë",
+            "2 domate",
+            "Qepë",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper"
+          ],
+          "instructions": "1. Skuqni patëllxhanët në vaj.\n2. Kaurdisni qepën dhe domatet.\n3. Shtoni patëllxhanët dhe gatuani së bashku për 20 minuta.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        },
+        {
+          "id": "30",
+          "name": "Sallatë Patate",
+          "ingredients": [
+            "4 patate të ziera",
+            "Qepë e kuqe",
+            "Vaj ulliri",
+            "Kripë",
+            "Piper",
+            "Uthull"
+          ],
+          "instructions": "1. Prisni patatet dhe qepën në copa.\n2. Përzieni me vaj ulliri, uthull, kripë dhe piper.\n3. Shërbejeni të freskët.",
+          "image": "http://localhost:3008/assets/images/recipedd.jpg"
+        }
+  ]
+}
