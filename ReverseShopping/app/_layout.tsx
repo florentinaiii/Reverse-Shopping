@@ -77,13 +77,28 @@ export default function RootLayout() {
         }}
       />
       <Tabs.Screen
-  name="auth"
-  options={{
-    title: "Autentifikimi",
-    headerShown: false,
-    tabBarButton: () => null, // This hides the tab bar button
-  }}
-/>
+        name="ChatBot"
+        options={{
+          title: "ChatBot",
+          headerTitle: "Reverse Shopping", 
+          headerLeft: () => (
+            <Ionicons
+              name="fast-food-outline"
+              size={24}
+              color="#000"
+              style={{ marginLeft: 10 }}
+            />
+          ), 
+          headerRight: () => (
+            <Ionicons name="person-outline" size={24} color="#000" style={{ marginRight: 10 }} />
+          ), 
+          tabBarIcon: ({ color, size }) => (
+            <Ionicons name="person-outline" size={size} color={color} />
+          ),
+        }}
+      />
+      
     </Tabs>
+    
   );
 }

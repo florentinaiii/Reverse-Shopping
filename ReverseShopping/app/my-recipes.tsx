@@ -110,7 +110,7 @@ export default function MyRecipesScreen() {
 
     if (isLoading) {
         return (
-            <ImageBackground source={require("../assets/images/background.jpg")} style={styles.background} resizeMode="cover">
+            <ImageBackground source={require("../assets/images/back.jpg")} style={styles.background} resizeMode="cover">
                 <View style={styles.backgroundOverlay} />
                 <View style={styles.centered}>
                     <ActivityIndicator size="large" color="#007AFF" />
@@ -124,7 +124,7 @@ export default function MyRecipesScreen() {
     return (
         <ImageBackground
             // Mund të përdorësh sfond të ndryshëm nëse do
-            source={require("../assets/images/background.jpg")}
+            source={require("../assets/images/recipedd.jpg")}
             style={styles.background}
             resizeMode="cover"
         >

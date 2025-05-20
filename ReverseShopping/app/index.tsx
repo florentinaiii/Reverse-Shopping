@@ -60,6 +60,20 @@ export const exampleRecipes: Recipe[] = [
         image: require("../assets/images/pastacarbonara.jpg"),
         instructions: "1. Zieni spagetit në ujë me kripë sipas udhëzimeve të paketimit.\n2. Ndërkohë, skuqni guanciale/pancetta në një tigan derisa të bëhet krokante...\n4. Shtoni spagetit e kulluar në tigan dhe përzieni mirë. Shërbejeni menjëherë me ekstra djathë Pecorino dhe piper të zi."
     },
+    {
+        id: "4",
+        name: "Supë Perimesh Kremoze", // Ndryshova emrin dhe përmbajtjen
+        ingredients: ["1 lugë gjelle vaj ulliri", "1 qepë e grirë", "2 karota të prera", "2 kërcenj selinoje të prerë", "4 patate mesatare, të qëruara dhe të prera", "1 litër lëng perimesh", "200ml qumësht ose pana gatimi", "Kripë dhe piper sipas shijes", "Majdanoz i freskët për zbukurim"],
+        image: require("../assets/images/supe.jpg"), // Supozojmë një imazh supe
+        instructions: "1. Ngrohni vajin e ullirit në një tenxhere të madhe. Skuqni qepën, karotat dhe selinonë derisa të zbuten (rreth 5-7 minuta).\n2. Shtoni patatet dhe lëngun e perimeve. Lërini të ziejnë, pastaj ulni zjarrin dhe lërini të ziejnë ngadalë për 15-20 minuta, ose derisa patatet të jenë shumë të buta.\n3. Përdorni një blender zhytës për të bërë supën kremoze direkt në tenxhere (ose transferojeni me kujdes në një blender normal dhe kthejeni në tenxhere).\n4. Shtoni qumështin ose panën, kripën dhe piperin. Përziejeni dhe ngroheni përsëri pa e lënë të vlojë.\n5. Shërbejeni të nxehtë, të zbukuruar me majdanoz të freskët."
+    },
+    {
+      id: "5",
+      name: "Tiramisu Klasike", // Recetë e re
+      ingredients: ["6 të verdha veze", "1 filxhan sheqer", "500g djathë mascarpone", "1 1/2 filxhan kafe espresso të fortë, të ftohur", "1/4 filxhan liker kafeje (opsionale)", "Rreth 24-30 biskota savoiardi (ladyfingers)", "Pluhur kakao pa sheqer për spërkatje"],
+      image: require("../assets/images/tiramisu.jpg"), // Supozojmë një imazh tiramisu
+      instructions: "1. Rrihni të verdhat e vezëve me sheqerin në një tas të madh derisa të zbardhen dhe të trashen.\n2. Shtoni djathin mascarpone dhe përziejeni butësisht derisa të kombinohen mirë pa e tepruar.\n3. Në një pjatë të cekët, përzieni kafenë espresso të ftohur me likerin (nëse po e përdorni).\n4. Zhytni shpejt secilën biskotë savoiardi në përzierjen e kafesë (mos i lini të lagen shumë) dhe vendosni një shtresë në fund të një ene qelqi drejtkëndëshe (p.sh., 20x30 cm).\n5. Mbuloni shtresën e biskotave me gjysmën e kremit të mascarpones.\n6. Përsëritni me një shtresë tjetër biskotash të lagura dhe pjesën e mbetur të kremit.\n7. Mbulojeni enën dhe vendoseni në frigorifer për të paktën 4-6 orë, ose idealisht gjatë gjithë natës.\n8. Para se ta shërbeni, spërkateni sipërfaqen bollshëm me pluhur kakao."
+  },
 ];
 
 const SAVED_RECIPES_KEY = '@saved_recipes';
@@ -314,7 +328,7 @@ interface RecipeDetailProps {
 
 function RecipeDetail({ recipe, onBack, toggleSavedRecipe, isSaved }: RecipeDetailProps) {
   return (
-    <ImageBackground source={require("../assets/images/background.jpg")} style={styles.bbackground} resizeMode="cover">
+    <ImageBackground source={require("../assets/images/recipedd.jpg")} style={styles.bbackground} resizeMode="cover">
       <View style={styles.backgroundOverlay} />
       <ScrollView style={styles.detailScrollContainer} contentContainerStyle={styles.detailScrollContentContainer}>
         <View style={styles.detailHeaderContainer}>
