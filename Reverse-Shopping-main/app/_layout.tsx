@@ -1,5 +1,5 @@
 import { Tabs } from "expo-router/tabs";
-import { Ionicons } from "@expo/vector-icons";
+import { Ionicons, MaterialCommunityIcons } from "@expo/vector-icons";
 import React from 'react';
 
 export default function TabsLayout() {
@@ -78,29 +78,34 @@ export default function TabsLayout() {
                     ),
                 }}
             />
-            <Tabs.Screen
-                name="chatbot"
-                options={{
-                    title: "ChatBot",
-                    headerTitle: "Reverse Shopping",
-                    headerLeft: () => (
-                        <Ionicons
-                            name="fast-food-outline"
-                            size={24}
-                            color="#000"
-                            style={{ marginLeft: 10 }}
-                        />
-                    ),
-                    headerRight: () => (
-                        <Ionicons name="chatbubble-outline" size={24} color="#000" style={{ marginRight: 10 }} />
-                    ),
-                    tabBarIcon: ({ color, size }) => (
-                        <Ionicons name="chatbubble-outline" size={size} color={color} />
-                    ),
-                }}
-            />
+<Tabs.Screen
+  name="CookingAssist"
+  options={{
+    title: "CookingAssist",
+    headerTitle: "Reverse Shopping", 
+    headerLeft: () => (
+      <MaterialCommunityIcons
+        name="chef-hat"
+        size={24}
+        color="#000"
+        style={{ marginLeft: 10 }}
+      />
+    ), 
+    headerRight: () => (
+      <Ionicons name="person-outline" size={24} color="#000" style={{ marginRight: 10 }} />
+    ), 
+    tabBarIcon: ({ color, size }) => (
+      <MaterialCommunityIcons name="chef-hat" size={size} color={color} />
+    ),
+  }}
+/>
+
             <Tabs.Screen name="auth" options={{ href: null }} />
             <Tabs.Screen name="layout" options={{ href: null }} />
         </Tabs>
     );
 }
+
+
+
+

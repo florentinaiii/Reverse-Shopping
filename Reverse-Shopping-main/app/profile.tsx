@@ -1,5 +1,14 @@
 import React, { useEffect, useState } from 'react';
-import { View, Text, TouchableOpacity, StyleSheet, ImageBackground, Alert, Image, ScrollView } from 'react-native';
+import {
+  View,
+  Text,
+  TouchableOpacity,
+  StyleSheet,
+  ImageBackground,
+  Alert,
+  Image,
+  ScrollView,
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { Link, router } from 'expo-router';
 import { auth } from './firebase';
@@ -29,12 +38,11 @@ const ProfileScreen = () => {
           setLastRecipe(recipes[recipes.length - 1]);
         }
       } catch (e) {
-        console.error("Failed to load saved recipes", e);
+        console.error('Failed to load saved recipes', e);
       }
     };
 
     loadRecipes();
-
     return () => unsubscribe();
   }, []);
 
@@ -43,18 +51,21 @@ const ProfileScreen = () => {
       await signOut(auth);
       router.replace('/');
     } catch (error) {
-      Alert.alert('Gabim', 'Ndodhi një gabim gjatë daljes. Ju lutem provoni përsëri.');
+      Alert.alert(
+        'Gabim',
+        'Ndodhi një gabim gjatë daljes. Ju lutem provoni përsëri.'
+      );
     }
   };
 
   if (loading) {
     return (
       <ImageBackground
-        source={require("../assets/images/background.jpg")}
+        source={require('../assets/images/background.jpg')}
         style={styles.background}
         resizeMode="cover"
       >
-        <View style={styles.container}>
+        <View style={styles.loadingContainer}>
           <Text style={styles.welcomeText}>Duke u ngarkuar...</Text>
         </View>
       </ImageBackground>
@@ -63,17 +74,21 @@ const ProfileScreen = () => {
 
   return (
     <ImageBackground
-      source={require("../assets/images/background.jpg")}
+      source={require('../assets/images/background.jpg')}
       style={styles.background}
       resizeMode="cover"
     >
       <ScrollView contentContainerStyle={styles.scrollContainer}>
-        <View style={styles.container}>
+        <View style={styles.contentContainer}>
           {user ? (
             <>
               <View style={styles.profileHeader}>
                 <Image
-                  source={{ uri: `https://ui-avatars.com/api/?name=${user.email?.charAt(0)}&background=007AFF&color=fff` }}
+                  source={{
+                    uri: `https://ui-avatars.com/api/?name=${user.email?.charAt(
+                      0
+                    )}&background=007AFF&color=fff`,
+                  }}
                   style={styles.profileImage}
                 />
                 <Text style={styles.welcomeText}>
@@ -81,52 +96,34 @@ const ProfileScreen = () => {
                 </Text>
               </View>
 
-              <View style={styles.profileCard}>
-                <View style={styles.infoRow}>
-                  <Ionicons name="mail-outline" size={24} color="#007AFF" />
-                  <Text style={styles.infoText}>{user.email}</Text>
-                </View>
-
-                <View style={styles.infoRow}>
-                  <Ionicons name="time-outline" size={24} color="#007AFF" />
-                  <Text style={styles.infoText}>Përdorues i regjistruar</Text>
-                </View>
-              </View>
-
-              {/* Seksioni i recetave */}
-              <View style={styles.recipesSection}>
-                <Text style={styles.sectionTitle}>Recetat e Mia</Text>
-
-                <View style={styles.recipeStats}>
-                  <View style={styles.statItem}>
-                    <Text style={styles.statNumber}>{savedRecipes.length}</Text>
-                    <Text style={styles.statLabel}>Receta të ruajtura</Text>
+              <View style={styles.statsCard}>
+                <Text style={styles.sectionTitle}>Recetat e mia</Text>
+                <View style={styles.statsRow}>
+                  <View style={styles.statBox}>
+                    <Text style={styles.subheading}>Recetat e ruajtura</Text>
+                    <Text style={styles.statNumber}>
+                      {savedRecipes.length}
+                    </Text>
                   </View>
-
-                  {lastRecipe && (
-                    <View style={styles.statItem}>
-                      <Text style={styles.statNumber}>E fundit:</Text>
-                      <Text style={styles.recipeName} numberOfLines={1}>
-                        {lastRecipe.name}
-                      </Text>
-                    </View>
-                  )}
+                  <View style={styles.statBox}>
+                    <Text style={styles.subheading}>Receta e fundit</Text>
+                    <Text style={styles.lastRecipeName}>
+                      {lastRecipe ? lastRecipe.name : 'Asnjë'}
+                    </Text>
+                  </View>
                 </View>
 
                 <Link href="/my-recipes" asChild>
                   <TouchableOpacity style={styles.recipesButton}>
-                    <Text style={styles.buttonText}>Shiko të gjitha recetat</Text>
+                    <Text style={styles.recipesButtonText}>Shiko të gjitha</Text>
                     <Ionicons name="arrow-forward" size={20} color="#007AFF" />
                   </TouchableOpacity>
                 </Link>
               </View>
 
-              <TouchableOpacity
-                style={styles.logoutButton}
-                onPress={handleLogout}
-              >
+              <TouchableOpacity style={styles.logoutButton} onPress={handleLogout}>
                 <Ionicons name="log-out-outline" size={20} color="#fff" />
-                <Text style={styles.buttonText}>Dilni nga Llogaria</Text>
+                <Text style={styles.logoutButtonText}>Dilni nga Llogaria</Text>
               </TouchableOpacity>
             </>
           ) : (
@@ -135,7 +132,7 @@ const ProfileScreen = () => {
               <Link href="/auth" asChild>
                 <TouchableOpacity style={styles.authButton}>
                   <Ionicons name="log-in-outline" size={20} color="#fff" />
-                  <Text style={styles.buttonText}>Regjistrohu/Kyçu</Text>
+                  <Text style={styles.authButtonText}>Regjistrohu/Kyçu</Text>
                 </TouchableOpacity>
               </Link>
             </>
@@ -153,13 +150,20 @@ const styles = StyleSheet.create({
   },
   scrollContainer: {
     flexGrow: 1,
+    paddingHorizontal: 16,
   },
-  container: {
+  loadingContainer: {
     flex: 1,
     justifyContent: 'center',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.7)',
-    padding: 20,
+  },
+  contentContainer: {
+    flex: 1,
+    maxWidth: 600,
+    width: '100%',
+    alignSelf: 'center',
+    paddingVertical: 20,
   },
   profileHeader: {
     alignItems: 'center',
@@ -178,74 +182,51 @@ const styles = StyleSheet.create({
     fontWeight: 'bold',
     color: '#333',
     textAlign: 'center',
-    marginBottom: 5,
   },
-  profileCard: {
-    width: '100%',
+  statsCard: {
     backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 20,
-    marginBottom: 20,
-    elevation: 3,
-    shadowColor: '#000',
-    shadowOffset: { width: 0, height: 2 },
-    shadowOpacity: 0.1,
-    shadowRadius: 6,
-  },
-  infoRow: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginBottom: 15,
-    paddingBottom: 15,
-    borderBottomWidth: 1,
-    borderBottomColor: '#f0f0f0',
-  },
-  infoText: {
-    marginLeft: 10,
-    fontSize: 16,
-    color: '#555',
-  },
-  recipesSection: {
     width: '100%',
-    backgroundColor: '#fff',
-    borderRadius: 15,
-    padding: 20,
+    paddingVertical: 20,
+    paddingHorizontal: 15,
+    borderRadius: 20,
+    marginTop: 30,
     marginBottom: 20,
-    elevation: 3,
+    elevation: 4,
   },
   sectionTitle: {
     fontSize: 20,
     fontWeight: 'bold',
     color: '#333',
-    marginBottom: 15,
+    marginBottom: 20,
     textAlign: 'center',
   },
-  recipeStats: {
+  statsRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    marginBottom: 15,
+    gap: 10,
+    marginBottom: 20,
   },
-  statItem: {
-    alignItems: 'center',
+  statBox: {
     flex: 1,
+    alignItems: 'center',
   },
-  statNumber: {
-    fontSize: 24,
-    fontWeight: 'bold',
-    color: '#007AFF',
+  subheading: {
+    fontSize: 16,
+    fontWeight: '600',
+    color: '#555',
     marginBottom: 5,
   },
-  statLabel: {
-    fontSize: 14,
-    color: '#666',
-    textAlign: 'center',
+  statNumber: {
+    fontSize: 22,
+    fontWeight: 'bold',
+    color: '#333',
+    fontStyle: 'italic',  
   },
-  recipeName: {
-    fontSize: 14,
-    color: '#555',
+  lastRecipeName: {
+    fontSize: 16,
+    color: '#333',
+    fontStyle: 'italic',
     textAlign: 'center',
-    marginTop: 5,
-    paddingHorizontal: 5,
   },
   recipesButton: {
     flexDirection: 'row',
@@ -256,6 +237,14 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
   },
+  recipesButtonText: {
+    color: '#333',
+    fontStyle: 'italic',
+    textAlign: 'center',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginRight: 10,
+  },
   authButton: {
     flexDirection: 'row',
     justifyContent: 'center',
@@ -264,8 +253,14 @@ const styles = StyleSheet.create({
     padding: 15,
     borderRadius: 10,
     marginTop: 20,
-    width: '80%',
+    width: '100%',
     elevation: 3,
+  },
+  authButtonText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+    marginLeft: 10,
   },
   logoutButton: {
     flexDirection: 'row',
@@ -276,10 +271,11 @@ const styles = StyleSheet.create({
     borderRadius: 10,
     marginTop: 10,
     width: '80%',
+    alignSelf: 'center',
     elevation: 3,
   },
-  buttonText: {
-    color: '#007AFF',
+  logoutButtonText: {
+    color: '#fff',
     fontSize: 16,
     fontWeight: 'bold',
     marginLeft: 10,

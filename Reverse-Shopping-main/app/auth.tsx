@@ -1,6 +1,15 @@
-// app/auth.tsx
 import React, { useState } from 'react';
-import { View, Text, TextInput, TouchableOpacity, StyleSheet, KeyboardAvoidingView, Platform, Alert } from 'react-native';
+import {
+    View,
+    Text,
+    TextInput,
+    TouchableOpacity,
+    StyleSheet,
+    KeyboardAvoidingView,
+    Platform,
+    Alert,
+    ImageBackground
+} from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { router } from 'expo-router';
 import { auth } from './firebase';
@@ -29,22 +38,12 @@ const AuthScreen = () => {
 
         try {
             if (isLogin) {
-                // Kyçja e përdoruesit ekzistues
                 await signInWithEmailAndPassword(auth, email, password);
                 Alert.alert('Sukses', 'Ju jeni kyçur me sukses!');
                 router.replace('/profile');
             } else {
-                // Regjistrimi i përdoruesit të ri
                 const userCredential = await createUserWithEmailAndPassword(auth, email, password);
                 const user = userCredential.user;
-
-                // Ruaj të dhënat shtesë të përdoruesit në Firestore (mund të implementohet më vonë)
-                // await setDoc(doc(db, "users", user.uid), {
-                //     firstName,
-                //     lastName,
-                //     email,
-                //     createdAt: new Date()
-                // });
 
                 Alert.alert('Sukses', 'Llogaria u krijua me sukses!');
                 router.replace('/profile');
@@ -77,84 +76,102 @@ const AuthScreen = () => {
     };
 
     return (
-        <KeyboardAvoidingView
-            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-            style={styles.container}
+        <ImageBackground
+            source={require('../assets/images/background.jpg')}
+            style={styles.background}
+            resizeMode="cover"
         >
-            <View style={styles.innerContainer}>
-                <Ionicons name="person-circle-outline" size={80} color="#007AFF" style={styles.icon} />
-                <Text style={styles.title}>{isLogin ? 'Kyçu në Llogarinë Tënde' : 'Krijo një Llogari të Re'}</Text>
-
-                {!isLogin && (
-                    <>
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Emri"
-                            value={firstName}
-                            onChangeText={setFirstName}
-                            autoCapitalize="words"
-                        />
-
-                        <TextInput
-                            style={styles.input}
-                            placeholder="Mbiemri"
-                            value={lastName}
-                            onChangeText={setLastName}
-                            autoCapitalize="words"
-                        />
-                    </>
-                )}
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Email"
-                    value={email}
-                    onChangeText={setEmail}
-                    keyboardType="email-address"
-                    autoCapitalize="none"
-                />
-
-                <TextInput
-                    style={styles.input}
-                    placeholder="Fjalëkalimi"
-                    value={password}
-                    onChangeText={setPassword}
-                    secureTextEntry
-                />
-
-                <TouchableOpacity
-                    style={[styles.authButton, isLoading && styles.disabledButton]}
-                    onPress={handleAuth}
-                    disabled={isLoading}
-                >
-                    {isLoading ? (
-                        <Text style={styles.authButtonText}>Duke u procesuar...</Text>
-                    ) : (
-                        <Text style={styles.authButtonText}>
-                            {isLogin ? 'Kyçu' : 'Regjistrohu'}
-                        </Text>
-                    )}
-                </TouchableOpacity>
-
-                <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
-                    <Text style={styles.toggleText}>
-                        {isLogin ? 'Nuk ke llogari? Regjistrohu' : 'Ke llogari? Kyçu'}
+            <KeyboardAvoidingView
+                behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+                style={styles.container}
+            >
+                <View style={styles.formWrapper}>
+                    <Ionicons name="person-circle-outline" size={80} color="#007AFF" style={styles.icon} />
+                    <Text style={styles.title}>
+                        {isLogin ? 'Kyçu në Llogarinë Tënde' : 'Krijo një Llogari të Re'}
                     </Text>
-                </TouchableOpacity>
-            </View>
-        </KeyboardAvoidingView>
+
+                    {!isLogin && (
+                        <>
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Emri"
+                                value={firstName}
+                                onChangeText={setFirstName}
+                                autoCapitalize="words"
+                            />
+                            <TextInput
+                                style={styles.input}
+                                placeholder="Mbiemri"
+                                value={lastName}
+                                onChangeText={setLastName}
+                                autoCapitalize="words"
+                            />
+                        </>
+                    )}
+
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Email"
+                        value={email}
+                        onChangeText={setEmail}
+                        keyboardType="email-address"
+                        autoCapitalize="none"
+                    />
+                    <TextInput
+                        style={styles.input}
+                        placeholder="Fjalëkalimi"
+                        value={password}
+                        onChangeText={setPassword}
+                        secureTextEntry
+                    />
+
+                    <TouchableOpacity
+                        style={[styles.authButton, isLoading && styles.disabledButton]}
+                        onPress={handleAuth}
+                        disabled={isLoading}
+                    >
+                        <Text style={styles.authButtonText}>
+                            {isLoading ? 'Duke u procesuar...' : isLogin ? 'Kyçu' : 'Regjistrohu'}
+                        </Text>
+                    </TouchableOpacity>
+
+                    <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
+                        <Text style={styles.toggleText}>
+                            {isLogin ? 'Nuk ke llogari? Regjistrohu' : 'Ke llogari? Kyçu'}
+                        </Text>
+                    </TouchableOpacity>
+                </View>
+            </KeyboardAvoidingView>
+        </ImageBackground>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        backgroundColor: '#f5f5f5',
-    },
-    innerContainer: {
+    background: {
         flex: 1,
         justifyContent: 'center',
-        padding: 20,
+        alignItems: 'center',
+        width: '100%',
+
+    },
+    container: {
+        flex: 1,
+        justifyContent: 'center',
+        width: '100%',
+        paddingHorizontal: 20,
+    },
+    formWrapper: {
+        width: '100%',
+        maxWidth: 400,
+        backgroundColor: 'rgba(255, 255, 255, 0.9)',
+        padding: 24,
+        borderRadius: 16,
+        alignSelf: 'center',
+        shadowColor: '#000',
+        shadowOpacity: 0.6,
+        shadowOffset: { width: 0, height: 2 },
+        shadowRadius: 6,
     },
     icon: {
         alignSelf: 'center',
