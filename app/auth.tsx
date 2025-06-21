@@ -13,10 +13,39 @@ const AuthScreen = () => {
     const [password, setPassword] = useState('');
     const [isLogin, setIsLogin] = useState(true);
     const [isLoading, setIsLoading] = useState(false);
+    
+    const handleForgotPassword = () => {
+        if (!email) {
+            Alert.alert('Gabim', 'Ju lutem shkruani email-in tuaj për të rivendosur fjalëkalimin');
+            return;
+        }
+        
+        // Here you would implement the password reset functionality
+        // For now, we'll just show an alert
+        Alert.alert(
+            'Rivendosje e fjalëkalimit',
+            'Një email për rivendosjen e fjalëkalimit do të dërgohet tek ' + email,
+            [{ text: 'OK' }]
+        );
+        
+        // In a real implementation, you would call Firebase's sendPasswordResetEmail
+        // sendPasswordResetEmail(auth, email)
+        //   .then(() => {
+        //     Alert.alert('Sukses', 'Email-i për rivendosjen e fjalëkalimit u dërgua');
+        //   })
+        //   .catch((error) => {
+        //     Alert.alert('Gabim', error.message);
+        //   });
+    };
 
     const handleAuth = async () => {
-        if (!email || !password) {
-            Alert.alert('Gabim', 'Ju lutem plotësoni email dhe fjalëkalimin');
+        if (!email) {
+            Alert.alert('Gabim', 'Ju lutem plotësoni email');
+            return;
+        }
+        
+        if (!password) {
+            Alert.alert('Gabim', 'Ju lutem shkruani fjalekalimin.');
             return;
         }
 
@@ -66,7 +95,21 @@ const AuthScreen = () => {
                     errorMessage = 'Përdoruesi nuk ekziston.';
                     break;
                 case 'auth/wrong-password':
-                    errorMessage = 'Fjalëkalimi i gabuar.';
+                    Alert.alert(
+                        'Fjalëkalimi i gabuar',
+                        'Keni harruar fjalekalimin?',
+                        [
+                            {
+                                text: 'Jo',
+                                style: 'cancel'
+                            },
+                            {
+                                text: 'Po, rivendos fjalekalimin',
+                                onPress: () => handleForgotPassword()
+                            }
+                        ]
+                    );
+                    return;
                     break;
             }
 
@@ -141,6 +184,14 @@ const AuthScreen = () => {
                         {isLogin ? 'Nuk ke llogari? Regjistrohu' : 'Ke llogari? Kyçu'}
                     </Text>
                 </TouchableOpacity>
+                
+                {isLogin && (
+                    <TouchableOpacity onPress={handleForgotPassword}>
+                        <Text style={styles.forgotPasswordText}>
+                            Keni harruar fjalëkalimin?
+                        </Text>
+                    </TouchableOpacity>
+                )}
             </View>
         </KeyboardAvoidingView>
     );
@@ -197,6 +248,12 @@ const styles = StyleSheet.create({
         color: '#007AFF',
         textAlign: 'center',
         marginTop: 20,
+        fontSize: 14,
+    },
+    forgotPasswordText: {
+        color: '#007AFF',
+        textAlign: 'center',
+        marginTop: 15,
         fontSize: 14,
     },
 });

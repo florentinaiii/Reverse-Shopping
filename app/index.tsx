@@ -21,8 +21,8 @@ import { useFonts, Satisfy_400Regular } from '@expo-google-fonts/satisfy';
 import { useRouter } from "expo-router";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import axios from 'axios';
+import { signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from 'firebase/auth';
 import { auth } from './firebase';
-import { getAuth, onAuthStateChanged } from 'firebase/auth';
 
 const { width } = Dimensions.get('window');
 const isMobile = width < 768;
@@ -35,21 +35,127 @@ interface AuthModalProps {
 }
 
 const AuthModal = ({ visible, onClose, onLogin }: AuthModalProps) => {
+  const [isLogin, setIsLogin] = useState(true);
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [username, setUsername] = useState('');
+  const [showPassword, setShowPassword] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  
   if (!visible) return null;
+  
+  const handleAuth = async () => {
+    setIsLoading(true);
+    setErrorMessage('');
+    
+    try {
+      if (isLogin) {
+        // Login
+        await signInWithEmailAndPassword(auth, email, password);
+        onClose(); // Close modal on successful login
+      } else {
+        // Register
+        const userCredential = await createUserWithEmailAndPassword(auth, email, password);
+        // Update profile with username if provided
+        if (username && userCredential.user) {
+          await updateProfile(userCredential.user, {
+            displayName: username
+          });
+        }
+        onClose(); // Close modal on successful registration
+      }
+    } catch (error: any) {
+      console.error('Authentication error:', error);
+      setErrorMessage(error.message || 'An error occurred during authentication');
+    } finally {
+      setIsLoading(false);
+    }
+  };
   
   return (
     <View style={styles.modalOverlay}>
-      <View style={styles.modalContent}>
-        <Text style={styles.modalTitle}>Regjistrohuni</Text>
-        <Text style={styles.modalMessage}>Ju lutem regjistrohuni për të ruajtur recetën.</Text>
-        <View style={styles.modalButtons}>
-          <TouchableOpacity style={styles.cancelButton} onPress={onClose}>
-            <Text style={styles.cancelButtonText}>Cancel</Text>
-          </TouchableOpacity>
-          <TouchableOpacity style={styles.loginButton} onPress={onLogin}>
-            <Text style={styles.loginButtonText}>Log In</Text>
+      <View style={styles.modalContainer}>
+        <Text style={styles.modalTitle}>
+          {isLogin ? 'Kyçu në llogari' : 'Krijo llogari'}
+        </Text>
+        
+        {!isLogin && (
+          <TextInput
+            placeholder="Username"
+            style={styles.input}
+            value={username}
+            onChangeText={setUsername}
+          />
+        )}
+        
+        <TextInput
+          placeholder="Email"
+          style={styles.input}
+          value={email}
+          onChangeText={setEmail}
+          keyboardType="email-address"
+        />
+        
+        <View style={styles.passwordContainer}>
+          <TextInput
+            placeholder="Fjalëkalimi"
+            style={styles.passwordInput}
+            value={password}
+            onChangeText={setPassword}
+            secureTextEntry={!showPassword}
+          />
+          <TouchableOpacity 
+            style={styles.eyeIcon} 
+            onPress={() => setShowPassword(!showPassword)}
+          >
+            <Ionicons 
+              name={showPassword ? "eye-off-outline" : "eye-outline"} 
+              size={24} 
+              color="#007AFF" 
+            />
           </TouchableOpacity>
         </View>
+        
+        {errorMessage ? (
+          <Text style={styles.errorText}>{errorMessage}</Text>
+        ) : null}
+        
+        <TouchableOpacity 
+          style={[styles.btnPrimary, isLoading && styles.btnDisabled]} 
+          onPress={handleAuth}
+          disabled={isLoading}
+        >
+          {isLoading ? (
+            <Text style={styles.btnText}>Loading...</Text>
+          ) : (
+            <>
+              <Ionicons name="log-in-outline" size={20} color="#fff" />
+              <Text style={styles.btnText}>{isLogin ? 'Kyçu' : 'Regjistrohu'}</Text>
+            </>
+          )}
+        </TouchableOpacity>
+        
+        <TouchableOpacity onPress={() => setIsLogin(!isLogin)}>
+          <Text style={styles.switchTextContent}>
+            {isLogin
+              ? 'Nuk ke llogari? Regjistrohu'
+              : 'Ke llogari? Kyçu këtu'}
+          </Text>
+        </TouchableOpacity>
+        
+        {isLogin && (
+          <TouchableOpacity>
+            <Text style={styles.forgotPasswordText}>Forgot your password?</Text>
+          </TouchableOpacity>
+        )}
+        
+        <TouchableOpacity
+          style={styles.closeBtn}
+          onPress={onClose}
+        >
+          <Ionicons name="close-circle" size={28} color="#007AFF" />
+        </TouchableOpacity>
       </View>
     </View>
   );
@@ -704,9 +810,9 @@ function HomePage({
         visible={authModalVisible} 
         onClose={() => setAuthModalVisible(false)} 
         onLogin={() => {
-          console.log('AuthModal - Log In button pressed, redirecting to /auth');
-          setAuthModalVisible(false);
-          router.push('/auth');
+          // Login is now handled directly in the AuthModal component
+          // No need to redirect to /auth
+          console.log('AuthModal - Login handled directly in the modal');
         }}
       />
       <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
@@ -799,9 +905,9 @@ function RecipeDetail({ recipe, onBack, toggleSavedRecipe, isSaved, router }: Re
         visible={authModalVisible} 
         onClose={() => setAuthModalVisible(false)} 
         onLogin={() => {
-          console.log('RecipeDetail - Log In button pressed, redirecting to /auth');
-          setAuthModalVisible(false);
-          router.push('/auth');
+          // Login is now handled directly in the AuthModal component
+          // No need to redirect to /auth
+          console.log('RecipeDetail - Login handled directly in the modal');
         }}
       />
       <ScrollView style={styles.detailScrollContainer} contentContainerStyle={styles.detailScrollContentContainer}>
@@ -869,56 +975,103 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     zIndex: 1000,
   },
-  modalContent: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    padding: 20,
-    width: '80%',
-    maxWidth: 400,
+  modalContainer: {
+    width: isMobile ? '80%' : '28%',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 20,
+    padding: 24,
+    elevation: 10,
     alignItems: 'center',
+    paddingTop: 40,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
   },
   modalTitle: {
-    fontSize: 18,
-    fontWeight: 'bold',
-    marginBottom: 10,
-    color: '#333',
+    fontSize: 20,
+    fontWeight: '700',
+    marginBottom: 18,
+    color: '#007AFF',
+    textAlign: 'center',
   },
   modalMessage: {
     fontSize: 16,
-    marginBottom: 20,
     textAlign: 'center',
-    color: '#555',
+    marginBottom: 20,
+    color: '#444',
   },
-  modalButtons: {
+  btnPrimary: {
     flexDirection: 'row',
-    justifyContent: 'space-between',
+    backgroundColor: '#007AFF',
+    paddingVertical: 16,
+    paddingHorizontal: 28,
+    borderRadius: 14,
+    justifyContent: 'center',
+    alignItems: 'center',
+    marginTop: 20,
+    elevation: 5,
     width: '100%',
   },
-  cancelButton: {
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#f0f0f0',
-    flex: 1,
-    marginRight: 10,
+  btnText: {
+    color: '#fff',
+    fontWeight: '400',
+    fontSize: 17,
+    marginLeft: 8,
+  },
+  switchText: {
+    marginTop: 16,
+    padding: 8,
+  },
+  switchTextContent: {
+    color: '#007AFF',
+    marginTop: 12,
+    fontWeight: '600',
+    textAlign: 'center',
+  },
+  closeBtn: {
+    position: 'absolute',
+    top: 12,
+    right: 12,
+  },
+  input: {
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    width: '100%',
+    padding: 14,
+    borderRadius: 10,
+    marginBottom: 12,
+    fontSize: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
+  },
+  passwordContainer: {
+    flexDirection: 'row',
+    width: '100%',
+    backgroundColor: 'rgba(255, 255, 255, 0.8)',
+    borderRadius: 10,
+    marginBottom: 16,
+    borderWidth: 1,
+    borderColor: '#ddd',
     alignItems: 'center',
   },
-  cancelButtonText: {
-    color: '#555',
-    fontWeight: '500',
-  },
-  loginButton: {
-    padding: 10,
-    borderRadius: 5,
-    backgroundColor: '#007AFF',
+  passwordInput: {
     flex: 1,
-    marginLeft: 10,
-    alignItems: 'center',
+    padding: 14,
+    fontSize: 16,
   },
-  loginButtonText: {
-    color: 'white',
-    fontWeight: '500',
+  eyeIcon: {
+    padding: 10,
   },
-  
+  btnDisabled: {
+    opacity: 0.7,
+    backgroundColor: '#999',
+  },
+  forgotPasswordText: {
+    color: '#007AFF',
+    marginTop: 16,
+    fontSize: 14,
+    textAlign: 'center',
+  },
   bbackground: {
     flex: 1,
     width: "100%"
