@@ -637,6 +637,7 @@ export default function App() {
       savedRecipeIds={savedRecipeIds}
       toggleSavedRecipe={toggleSavedRecipe}
       isSearching={isSearching}
+      setIsSearching={setIsSearching}
       isLoading={isLoading}
       router={router} // Pass router as a prop
     />
@@ -655,6 +656,7 @@ export interface HomePageProps {
   savedRecipeIds: string[];
   toggleSavedRecipe: (recipe: Recipe) => void;
   isSearching: boolean;
+  setIsSearching: (value: boolean) => void;
   isLoading: boolean;
   router: any; // Add router prop
 }
@@ -671,6 +673,7 @@ function HomePage({
   savedRecipeIds,
   toggleSavedRecipe,
   isSearching,
+  setIsSearching,
   isLoading,
   router
 }: HomePageProps) {
@@ -717,6 +720,7 @@ function HomePage({
       );
     }
 
+    // Show no results message only when a search has been performed and no recipes were found
     if (filteredRecipes.length === 0 && hasSearched) {
       return (
         <View style={{ flex: 1, justifyContent: 'center', alignItems: 'center', paddingTop: 50 }}>
@@ -732,12 +736,15 @@ function HomePage({
     // Show recipes when we have search results
     return (
       <>
-        <View style={styles.searchResultsHeader}>
-          <Text style={styles.searchResultsTitle}>
-            Recetat me: <Text style={styles.searchedIngredients}>{searchQuery}</Text>
-          </Text>
-          <Text style={styles.resultsCount}>{filteredRecipes.length} receta</Text>
-        </View>
+        {/* Only show the "Recetat me:" section after a search has been performed */}
+        {hasSearched && (
+          <View style={styles.searchResultsHeader}>
+            <Text style={styles.searchResultsTitle}>
+              Recetat me: <Text style={styles.searchedIngredients}>{searchQuery}</Text>
+            </Text>
+            <Text style={styles.resultsCount}>{filteredRecipes.length} receta</Text>
+          </View>
+        )}
         <FlatList
           data={filteredRecipes}
           keyExtractor={(item) => item.id}
@@ -802,20 +809,25 @@ function HomePage({
   };
 
   return (
-    <ImageBackground source={require("../assets/images/background.jpg")} style={styles.background} resizeMode="cover">
-      <View style={styles.backgroundOverlay} />
-      
-      {/* Authentication Modal */}
-      <AuthModal 
-        visible={authModalVisible} 
-        onClose={() => setAuthModalVisible(false)} 
-        onLogin={() => {
-          // Login is now handled directly in the AuthModal component
-          // No need to redirect to /auth
-          console.log('AuthModal - Login handled directly in the modal');
-        }}
-      />
-      <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
+    <ScrollView 
+      style={styles.scrollView}
+      contentContainerStyle={styles.scrollViewContent}
+      showsVerticalScrollIndicator={false}
+    >
+      <ImageBackground source={require("../assets/images/background.jpg")} style={styles.background} resizeMode="cover">
+        <View style={styles.backgroundOverlay} />
+        
+        {/* Authentication Modal */}
+        <AuthModal 
+          visible={authModalVisible} 
+          onClose={() => setAuthModalVisible(false)} 
+          onLogin={() => {
+            // Login is now handled directly in the AuthModal component
+            // No need to redirect to /auth
+            console.log('AuthModal - Login handled directly in the modal');
+          }}
+        />
+        <KeyboardAvoidingView behavior={Platform.OS === "ios" ? "padding" : "height"} style={styles.container}>
         {!hasSearched && (
           <View style={styles.headerContainer}>
             <Text style={styles.appTitle}>REVERSE SHOPPING</Text>
@@ -850,17 +862,36 @@ function HomePage({
             </TouchableOpacity>
           </View>
           <Text style={styles.searchHelpText}></Text>
+          
+          {/* Show All Recipes button */}
+          <TouchableOpacity 
+            style={styles.showAllButton} 
+            onPress={async () => {
+              setIsSearching(true);
+              try {
+                const allRecipes = await fetchAllRecipes();
+                setFilteredRecipes(allRecipes);
+                // Show recipes but hide the "Recipes with:" section
+                setHasSearched(false);
+              } catch (error) {
+                console.error('Error fetching all recipes:', error);
+                Alert.alert('Gabim', 'Ndodhi një gabim gjatë marrjes së recetave.');
+              } finally {
+                setIsSearching(false);
+              }
+            }}
+          >
+            <Ionicons name="grid-outline" size={18} color="white" style={{marginRight: 8}} />
+            <Text style={styles.showAllButtonText}>Shfaq të gjitha recetat</Text>
+          </TouchableOpacity>
         </View>
 
-        {!hasSearched && searchQuery.length > 0 && (
-          <View style={styles.suggestionsContainer}>
-            {/* Suggestions removed with translation functionality */}
-          </View>
-        )}
+        {/* Suggestions container removed to eliminate white line when typing */}
 
         {renderRecipeList()}
       </KeyboardAvoidingView>
     </ImageBackground>
+    </ScrollView>
   );
 }
 
@@ -964,6 +995,13 @@ function RecipeDetail({ recipe, onBack, toggleSavedRecipe, isSaved, router }: Re
 
 // ======== STILET ========
 const styles = StyleSheet.create({
+  scrollView: {
+    flex: 1,
+    backgroundColor: '#f5f5f5',
+  },
+  scrollViewContent: {
+    flexGrow: 1,
+  },
   modalOverlay: {
     position: 'absolute',
     top: 0,
@@ -1364,19 +1402,7 @@ const styles = StyleSheet.create({
     padding: 4,
     marginRight: 4,
   },
-  suggestionsContainer: {
-    backgroundColor: 'white',
-    borderRadius: 10,
-    marginTop: 5,
-    padding: 10,
-    width: '90%',
-    alignSelf: 'center',
-    shadowColor: "#000",
-    shadowOffset: { width: 0, height: 1 },
-    shadowOpacity: 0.2,
-    shadowRadius: 2,
-    elevation: 3,
-  },
+  // Removed suggestionsContainer to eliminate white line when typing
   suggestionItem: {
     paddingVertical: 8,
     borderBottomWidth: 1,
@@ -1385,6 +1411,27 @@ const styles = StyleSheet.create({
   suggestionText: {
     fontSize: 16,
     color: '#333',
+  },
+  showAllButton: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: '#4CAF50',
+    paddingVertical: 10,
+    paddingHorizontal: 16,
+    borderRadius: 8,
+    marginTop: 12,
+    marginBottom: 8,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.1,
+    shadowRadius: 3,
+    elevation: 2,
+  },
+  showAllButtonText: {
+    color: 'white',
+    fontSize: 16,
+    fontWeight: '600',
   },
   flatListContent: {
     flex: 1,

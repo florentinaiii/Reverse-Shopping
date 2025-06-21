@@ -11,10 +11,7 @@ import {
   StatusBar,
   ImageBackground,
   Alert,
-  ActivityIndicator,
 } from 'react-native';
-import { useRouter } from 'expo-router';
-import * as ImagePicker from 'expo-image-picker';
 import { Ionicons } from '@expo/vector-icons';
 import { auth } from './firebase';
 import {
@@ -23,16 +20,12 @@ import {
   createUserWithEmailAndPassword,
   signInWithEmailAndPassword,
   updateProfile,
-  fetchSignInMethodsForEmail,
-  EmailAuthProvider,
 } from 'firebase/auth';
-import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const SAVED_RECIPES_KEY = '@saved_recipes';
 
 const ProfileScreen = () => {
-  const router = useRouter();
   const [user, setUser] = useState<any>(null);
   const [loading, setLoading] = useState(true);
   const [savedRecipes, setSavedRecipes] = useState<any[]>([]);
@@ -45,20 +38,10 @@ const ProfileScreen = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState('');
   const [showPassword, setShowPassword] = useState(false);
-  
-  // Profile editing states
-  const [editProfileModalVisible, setEditProfileModalVisible] = useState(false);
-  const [newDisplayName, setNewDisplayName] = useState('');
-  const [profileImage, setProfileImage] = useState<string | null>(null);
-  const [uploadingImage, setUploadingImage] = useState(false);
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, (currentUser) => {
       setUser(currentUser);
-      if (currentUser) {
-        setNewDisplayName(currentUser.displayName || '');
-        setProfileImage(currentUser.photoURL || null);
-      }
       setLoading(false);
     });
 
@@ -89,91 +72,6 @@ const ProfileScreen = () => {
       `Një link për resetimin e fjalëkalimit do të dërgohet tek ${email}.`,
       [{ text: 'OK' }]
     );
-  };
-
-  const pickImage = async () => {
-    try {
-      // Request permissions
-      const { status } = await ImagePicker.requestMediaLibraryPermissionsAsync();
-      
-      if (status !== 'granted') {
-        Alert.alert('Leje e nevojshme', 'Na duhet leja për të aksesuar galeritë tuaj.');
-        return;
-      }
-      
-      // Launch image picker
-      const result = await ImagePicker.launchImageLibraryAsync({
-        mediaTypes: ImagePicker.MediaTypeOptions.Images,
-        allowsEditing: true,
-        aspect: [1, 1],
-        quality: 0.7,
-      });
-      
-      if (!result.canceled && result.assets && result.assets.length > 0) {
-        setProfileImage(result.assets[0].uri);
-      }
-    } catch (error) {
-      console.error('Error picking image:', error);
-      Alert.alert('Gabim', 'Ndodhi një gabim gjatë zgjedhjes së fotos.');
-    }
-  };
-  
-  const uploadProfileImage = async () => {
-    if (!profileImage || !user) return null;
-    
-    try {
-      setUploadingImage(true);
-      
-      // Create a reference to Firebase Storage
-      const storage = getStorage();
-      const filename = `profile_${user.uid}_${new Date().getTime()}`;
-      const storageRef = ref(storage, `profile_images/${filename}`);
-      
-      // Fetch the image and convert to blob
-      const response = await fetch(profileImage);
-      const blob = await response.blob();
-      
-      // Upload to Firebase Storage
-      await uploadBytes(storageRef, blob);
-      
-      // Get the download URL
-      const downloadURL = await getDownloadURL(storageRef);
-      return downloadURL;
-    } catch (error) {
-      console.error('Error uploading image:', error);
-      Alert.alert('Gabim', 'Ndodhi një gabim gjatë ngarkimit të fotos.');
-      return null;
-    } finally {
-      setUploadingImage(false);
-    }
-  };
-  
-  const saveProfileChanges = async () => {
-    if (!user) return;
-    
-    setIsLoading(true);
-    try {
-      let photoURL = user.photoURL;
-      
-      // Upload new profile image if changed
-      if (profileImage && profileImage !== user.photoURL) {
-        photoURL = await uploadProfileImage();
-      }
-      
-      // Update profile
-      await updateProfile(user, {
-        displayName: newDisplayName.trim() || user.displayName,
-        photoURL: photoURL || user.photoURL
-      });
-      
-      Alert.alert('Sukses', 'Profili u përditësua me sukses!');
-      setEditProfileModalVisible(false);
-    } catch (error) {
-      console.error('Error updating profile:', error);
-      Alert.alert('Gabim', 'Ndodhi një gabim gjatë përditësimit të profilit.');
-    } finally {
-      setIsLoading(false);
-    }
   };
 
   const handleLogout = async () => {
@@ -251,44 +149,28 @@ const ProfileScreen = () => {
         {user ? (
           <>
             <View style={s.profileCard}>
-              <TouchableOpacity onPress={() => setEditProfileModalVisible(true)}>
-                <Image
-                  source={{
-                    uri: user.photoURL || `https://ui-avatars.com/api/?name=${user.displayName?.charAt(0) || 'U'}&background=007AFF&color=fff`,
-                  }}
-                  style={s.avatar}
-                />
-                <View style={s.editIconContainer}>
-                  <Ionicons name="pencil" size={16} color="#fff" />
-                </View>
-              </TouchableOpacity>
+              <Image
+                source={{
+                  uri: `https://ui-avatars.com/api/?name=${user.displayName?.charAt(0)}&background=007AFF&color=fff`,
+                }}
+                style={s.avatar}
+              />
               <Text style={s.greeting}>Mirësevini, {user.displayName}!</Text>
-              <TouchableOpacity onPress={() => setEditProfileModalVisible(true)}>
-                <Text style={s.editProfileText}>Ndrysho profilin</Text>
-              </TouchableOpacity>
             </View>
 
             <View style={s.statsCard}>
               <Text style={s.section}>Recetat e mia</Text>
               <View style={s.statRow}>
                 <View style={s.statBox}>
+                  <Text style={s.statLabel}>Ruajtura</Text>
                   <Text style={s.statValue}>{savedRecipes.length}</Text>
-                  <Text style={s.statLabel}>Receta të ruajtura</Text>
                 </View>
-              </View>
-              
-              <TouchableOpacity 
-                style={s.myRecipesButton}
-                onPress={() => router.push('/my-recipes')}
-              >
-                <Ionicons name="restaurant-outline" size={22} color="#fff" />
-                <Text style={s.myRecipesButtonText}>Recetat e Mia</Text>
-              </TouchableOpacity>
-              <View style={s.statBox}>
-                <Text style={s.statLabel}>E fundit</Text>
-                <Text style={s.statValue}>
-                  {lastRecipe ? lastRecipe.name : 'Asnjë'}
-                </Text>
+                <View style={s.statBox}>
+                  <Text style={s.statLabel}>E fundit</Text>
+                  <Text style={s.statValue}>
+                    {lastRecipe ? lastRecipe.name : 'Asnjë'}
+                  </Text>
+                </View>
               </View>
             </View>
 
@@ -392,73 +274,6 @@ const ProfileScreen = () => {
           </View>
         </View>
       </Modal>
-
-      {/* Edit Profile Modal */}
-      <Modal visible={editProfileModalVisible} transparent animationType="fade">
-        <View style={s.modalOverlay}>
-          <View style={s.modalContainer}>
-            <Text style={s.modalTitle}>Ndrysho Profilin</Text>
-            
-            <TouchableOpacity style={s.photoContainer} onPress={pickImage}>
-              {uploadingImage ? (
-                <ActivityIndicator size="large" color="#007AFF" />
-              ) : (
-                <Image
-                  source={{
-                    uri: profileImage || `https://ui-avatars.com/api/?name=${user?.displayName?.charAt(0) || 'U'}&background=007AFF&color=fff`,
-                  }}
-                  style={s.profilePhoto}
-                />
-              )}
-              <View style={s.cameraIconContainer}>
-                <Ionicons name="camera" size={20} color="#fff" />
-              </View>
-            </TouchableOpacity>
-            <Text style={s.photoHint}>Prek foton për ta ndryshuar</Text>
-            
-            <Text style={s.inputLabel}>Emri</Text>
-            <TextInput
-              placeholder="Emri juaj"
-              style={s.input}
-              value={newDisplayName}
-              onChangeText={setNewDisplayName}
-            />
-            
-            <View style={s.buttonRow}>
-              <TouchableOpacity 
-                style={s.cancelButton} 
-                onPress={() => {
-                  setEditProfileModalVisible(false);
-                  // Reset to original values
-                  setNewDisplayName(user?.displayName || '');
-                  setProfileImage(user?.photoURL || null);
-                }}
-              >
-                <Text style={s.cancelButtonText}>Anullo</Text>
-              </TouchableOpacity>
-              
-              <TouchableOpacity 
-                style={[s.saveButton, isLoading && s.btnDisabled]}
-                onPress={saveProfileChanges}
-                disabled={isLoading}
-              >
-                {isLoading ? (
-                  <ActivityIndicator size="small" color="#fff" />
-                ) : (
-                  <Text style={s.saveButtonText}>Ruaj</Text>
-                )}
-              </TouchableOpacity>
-            </View>
-            
-            <TouchableOpacity
-              style={s.closeBtn}
-              onPress={() => setEditProfileModalVisible(false)}
-            >
-              <Ionicons name="close-circle" size={28} color="#007AFF" />
-            </TouchableOpacity>
-          </View>
-        </View>
-      </Modal>
     </ImageBackground>
   );
 };
@@ -497,25 +312,6 @@ const s = StyleSheet.create({
     height: 100,
     borderRadius: 50,
     marginBottom: 12,
-  },
-  editIconContainer: {
-    position: 'absolute',
-    bottom: 10,
-    right: 0,
-    backgroundColor: '#007AFF',
-    width: 28,
-    height: 28,
-    borderRadius: 14,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  editProfileText: {
-    color: '#007AFF',
-    fontSize: 14,
-    marginTop: 5,
-    textDecorationLine: 'underline',
   },
   greeting: {
     fontSize: 22,
@@ -672,97 +468,6 @@ const s = StyleSheet.create({
   },
   eyeIcon: {
     padding: 10,
-  },
-  photoContainer: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    marginBottom: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    backgroundColor: '#f0f0f0',
-  },
-  profilePhoto: {
-    width: 120,
-    height: 120,
-    borderRadius: 60,
-    borderWidth: 3,
-    borderColor: '#007AFF',
-  },
-  cameraIconContainer: {
-    position: 'absolute',
-    bottom: 0,
-    right: 0,
-    backgroundColor: '#007AFF',
-    width: 36,
-    height: 36,
-    borderRadius: 18,
-    justifyContent: 'center',
-    alignItems: 'center',
-    borderWidth: 2,
-    borderColor: '#fff',
-  },
-  photoHint: {
-    color: '#666',
-    fontSize: 14,
-    marginBottom: 20,
-    textAlign: 'center',
-  },
-  inputLabel: {
-    alignSelf: 'flex-start',
-    marginLeft: 10,
-    marginBottom: 5,
-    color: '#555',
-    fontWeight: '500',
-  },
-  buttonRow: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    width: '100%',
-    marginTop: 20,
-  },
-  cancelButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    marginRight: 10,
-    backgroundColor: '#f0f0f0',
-    alignItems: 'center',
-  },
-  cancelButtonText: {
-    color: '#555',
-    fontWeight: '500',
-  },
-  saveButton: {
-    flex: 1,
-    padding: 12,
-    borderRadius: 8,
-    marginLeft: 10,
-    backgroundColor: '#007AFF',
-    alignItems: 'center',
-  },
-  saveButtonText: {
-    color: '#fff',
-    fontWeight: '500',
-  },
-  myRecipesButton: {
-    flexDirection: 'row',
-    backgroundColor: '#007AFF',
-    paddingVertical: 12,
-    paddingHorizontal: 20,
-    borderRadius: 10,
-    justifyContent: 'center',
-    alignItems: 'center',
-    marginTop: 20,
-    marginBottom: 20,
-    alignSelf: 'center',
-    elevation: 3,
-  },
-  myRecipesButtonText: {
-    color: '#fff',
-    fontSize: 16,
-    fontWeight: '600',
-    marginLeft: 8,
   },
 });
 
