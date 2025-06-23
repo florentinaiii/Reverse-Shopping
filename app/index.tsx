@@ -511,7 +511,7 @@ export default function App() {
         return;
       }
 
-      const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+      const days = ['E Hene', 'E Marte', 'E Merkure', 'E Enjte', 'E Premte', 'E Shtune', 'E Diel'];
       const mealPlan: {[day: string]: {breakfast: Recipe | null, lunch: Recipe | null, dinner: Recipe | null}} = {};
       
       const shuffledRecipes = [...recipesForPlan].sort(() => 0.5 - Math.random());

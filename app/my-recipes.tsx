@@ -39,8 +39,21 @@ const getRecipeImageSource = (recipe: Recipe) => {
 };
 
 const { width, height } = Dimensions.get('window');
-const isMobile = width < 600; // Changed from 768 to better target tablets
+const isMobile = width < 600;
 const isTablet = width >= 600 && width < 1000;
+
+const SAVED_RECIPES_KEY = '@saved_recipes';
+const SAVED_MEAL_PLANS_KEY = '@saved_meal_plans';
+
+const albanianDays = {
+  Monday: 'E Hënë',
+  Tuesday: 'E Martë',
+  Wednesday: 'E Mërkurë',
+  Thursday: 'E Enjte',
+  Friday: 'E Premte',
+  Saturday: 'E Shtunë',
+  Sunday: 'E Diel'
+};
 
 export default function MyRecipesScreen() {
     const router = useRouter();
@@ -53,11 +66,7 @@ export default function MyRecipesScreen() {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
 
     const getApiBaseUrl = () => {
-        if (Platform.OS === 'web') {
-            return 'http://localhost:5000';
-        } else {
-            return 'http://localhost:5000';
-        }
+        return Platform.OS === 'android' ? 'http://10.0.2.2:5000' : 'http://localhost:5000';
     };
 
     const loadSavedData = useCallback(async () => {
@@ -89,7 +98,6 @@ export default function MyRecipesScreen() {
             // Try to fetch from backend API
             try {
                 const response = await axios.get(`${getApiBaseUrl()}/saved-recipes`);
-                console.log('Fetched saved recipes from backend:', response.data);
                 
                 if (response.data && Array.isArray(response.data)) {
                     const validRecipes = response.data.filter((item: any) => {
@@ -130,7 +138,13 @@ export default function MyRecipesScreen() {
             const storedMealPlans = await AsyncStorage.getItem(`${SAVED_MEAL_PLANS_KEY}_${currentUser.uid}`);
             if (storedMealPlans) {
                 const parsedMealPlans = JSON.parse(storedMealPlans);
-                setSavedMealPlans(parsedMealPlans);
+                // Ensure meal plans have proper structure
+                const validatedMealPlans = parsedMealPlans.map((plan: any) => ({
+                    ...plan,
+                    plan: plan.plan || {},
+                    name: plan.name || 'Plan i padeklaruar'
+                }));
+                setSavedMealPlans(validatedMealPlans);
             }
 
         } catch (e) {
@@ -151,16 +165,16 @@ export default function MyRecipesScreen() {
                 setSavedMealPlans([]);
                 
                 Alert.alert(
-                    'Sign Up or Log In', 
-                    'Please sign up or log in to view saved recipes and meal plans.',
+                    'Regjistrohu ose Kyçu', 
+                    'Ju lutemi regjistrohuni ose kyçuni për të parë recetat dhe planet e ruajtura.',
                     [
                         { 
-                            text: 'Cancel', 
+                            text: 'Anulo', 
                             style: 'cancel',
                             onPress: () => router.replace('./')
                         },
                         { 
-                            text: '→ Go to Login', 
+                            text: 'Shko te Kyçja', 
                             onPress: () => router.push('./auth')
                         }
                     ]
@@ -196,16 +210,15 @@ export default function MyRecipesScreen() {
             if (recipe._id) {
                 try {
                     await axios.delete(`${getApiBaseUrl()}/saved-recipes/${recipe._id}`);
-                    console.log('Recipe removed from backend:', recipe.name);
                 } catch (backendError) {
                     console.error('Failed to remove recipe from backend:', backendError);
                 }
             }
             
-            Alert.alert('Success', 'Recipe removed from saved');
+            Alert.alert('Sukses', 'Receta u hoq nga të ruajturat');
         } catch (e) {
             console.error("Failed to unsave recipe", e);
-            Alert.alert('Error', 'Failed to remove recipe');
+            Alert.alert('Gabim', 'Ndodhi një gabim gjatë heqjes së recetës');
             loadSavedData();
         }
     };
@@ -224,10 +237,10 @@ export default function MyRecipesScreen() {
 
             await AsyncStorage.setItem(storageKey, JSON.stringify(updatedMealPlans));
             
-            Alert.alert('Success', 'Meal plan removed');
+            Alert.alert('Sukses', 'Plani u hoq');
         } catch (e) {
             console.error("Failed to unsave meal plan", e);
-            Alert.alert('Error', 'Failed to remove meal plan');
+            Alert.alert('Gabim', 'Ndodhi një gabim gjatë heqjes së planit');
             loadSavedData();
         }
     };
@@ -276,9 +289,9 @@ export default function MyRecipesScreen() {
                     <Ionicons name="trash-outline" size={24} color="white" />
                 </TouchableOpacity>
                 <View style={styles.imageOverlay}>
-                    <Text style={styles.recipeName} numberOfLines={2}>{mealPlan.name}</Text>
+                    <Text style={styles.mealPlanName} numberOfLines={2}>{mealPlan.name}</Text>
                     <View style={styles.recipeFooter}>
-                        <Text style={styles.viewRecipeText}>View meal plan</Text>
+                        <Text style={styles.viewRecipeText}>Shiko planin</Text>
                         <Ionicons name="arrow-forward" size={16} color="white" />
                     </View>
                 </View>
@@ -289,7 +302,7 @@ export default function MyRecipesScreen() {
     const renderMealPlanDetail = () => {
         if (!viewingMealPlan) return null;
         
-        const days = ['E Hene', 'E Marte', 'E Merkure', 'E Enjte', 'E Premte', 'E Shtune', 'E Diel'];
+        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
         
         return (
             <ScrollView style={styles.detailScrollContainer} contentContainerStyle={styles.scrollContentContainer}>
@@ -311,14 +324,14 @@ export default function MyRecipesScreen() {
                 <View style={styles.mealPlanDetailContainer}>
                     {days.map(day => (
                         <View key={day} style={styles.mealPlanDayContainer}>
-                            <Text style={styles.mealPlanDayTitle}>{day}</Text>
+                            <Text style={styles.mealPlanDayTitle}>{albanianDays[day as keyof typeof albanianDays]}</Text>
                             
                             {viewingMealPlan.plan[day]?.breakfast && (
                                 <TouchableOpacity 
                                     style={styles.mealPlanMealItem}
                                     onPress={() => handleShowRecipeDetails(viewingMealPlan.plan[day].breakfast)}
                                 >
-                                    <Text style={styles.mealPlanMealType}>Mengjesi:</Text>
+                                    <Text style={styles.mealPlanMealType}>Mëngjesi:</Text>
                                     <Text style={styles.mealPlanMealName}>{viewingMealPlan.plan[day].breakfast.name}</Text>
                                 </TouchableOpacity>
                             )}
@@ -355,7 +368,7 @@ export default function MyRecipesScreen() {
                 <View style={styles.backgroundOverlay} />
                 <View style={styles.centered}>
                     <ActivityIndicator size="large" color="#007AFF" />
-                    <Text style={styles.loadingText}>Loading Saved Data...</Text>
+                    <Text style={styles.loadingText}>Duke ngarkuar të dhënat...</Text>
                 </View>
             </ImageBackground>
         );
@@ -397,7 +410,7 @@ export default function MyRecipesScreen() {
                             </View>
                             <View style={[styles.detailIngredientsContainer, isTablet && styles.detailIngredientsContainerTablet]}>
                                 <View style={styles.section}>
-                                    <Text style={styles.sectionTitle}>Ingredients</Text>
+                                    <Text style={styles.sectionTitle}>Përbërësit</Text>
                                     {viewingRecipe.ingredients.map((ingredient, index) => (
                                         <View key={index} style={styles.ingredientItem}>
                                             <Ionicons name="ellipse" size={8} color="#007AFF" style={styles.ingredientIcon} />
@@ -410,7 +423,7 @@ export default function MyRecipesScreen() {
 
                         <View style={styles.detailInstructionsContainer}>
                             <View style={styles.section}>
-                                <Text style={styles.sectionTitle}>Instructions</Text>
+                                <Text style={styles.sectionTitle}>Udhëzimet</Text>
                                 <Text style={styles.instructionsText}>
                                     {viewingRecipe.instructions}
                                 </Text>
@@ -428,7 +441,7 @@ export default function MyRecipesScreen() {
                                 <Ionicons name="arrow-back" size={24} color="#333" />
                             </TouchableOpacity>
                             <Text style={styles.detailTitle} numberOfLines={1} ellipsizeMode='tail'>
-                                Saved Recipes
+                                Recetat e mia
                             </Text>
                             <View style={styles.headerPlaceholderRight} />
                         </View>
@@ -444,7 +457,7 @@ export default function MyRecipesScreen() {
                                 style={[styles.tabButton, activeTab === 'mealPlans' && styles.activeTab]}
                                 onPress={() => setActiveTab('mealPlans')}
                             >
-                                <Text style={[styles.tabText, activeTab === 'mealPlans' && styles.activeTabText]}>Planet javore</Text>
+                                <Text style={[styles.tabText, activeTab === 'mealPlans' && styles.activeTabText]}>Planet</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -452,7 +465,7 @@ export default function MyRecipesScreen() {
                             savedRecipes.length === 0 ? (
                                 <View style={styles.centeredEmpty}>
                                     <Ionicons name="archive-outline" size={60} color="#ccc" />
-                                    <Text style={styles.noRecipesText}>Nuk ka receta te ruajtura</Text>
+                                    <Text style={styles.noRecipesText}>Nuk keni receta të ruajtura</Text>
                                 </View>
                             ) : (
                                 <FlatList
@@ -486,7 +499,7 @@ export default function MyRecipesScreen() {
                                                 <View style={styles.imageOverlay}>
                                                     <Text style={styles.recipeName} numberOfLines={2}>{item.name}</Text>
                                                     <View style={styles.recipeFooter}>
-                                                        <Text style={styles.viewRecipeText}>Shiko receten</Text>
+                                                        <Text style={styles.viewRecipeText}>Shiko recetën</Text>
                                                         <Ionicons name="arrow-forward" size={16} color="white" />
                                                     </View>
                                                 </View>
@@ -500,7 +513,7 @@ export default function MyRecipesScreen() {
                             savedMealPlans.length === 0 ? (
                                 <View style={styles.centeredEmpty}>
                                     <Ionicons name="calendar-outline" size={60} color="#ccc" />
-                                    <Text style={styles.noRecipesText}>Nuk ka plan javor vaktesh te ruajtur</Text>
+                                    <Text style={styles.noRecipesText}>Nuk keni plane të ruajtura</Text>
                                 </View>
                             ) : (
                                 <FlatList
@@ -521,9 +534,6 @@ export default function MyRecipesScreen() {
         </ImageBackground>
     );
 }
-
-const SAVED_RECIPES_KEY = '@saved_recipes';
-const SAVED_MEAL_PLANS_KEY = '@saved_meal_plans';
 
 const styles = StyleSheet.create({
     background: { flex: 1, width: "100%" },
@@ -648,6 +658,15 @@ const styles = StyleSheet.create({
         fontSize: isMobile ? 15 : (isTablet ? 16 : 16),
         color: '#333',
         marginTop: 4,
+    },
+    mealPlanName: {
+        fontSize: isMobile ? 16 : (isTablet ? 17 : 18),
+        fontWeight: "bold",
+        color: "white",
+        marginBottom: 8,
+        textShadowColor: 'rgba(0,0,0,0.8)',
+        textShadowOffset: { width: 0, height: 1 },
+        textShadowRadius: 3,
     },
     detailContentWrapper: {
         paddingHorizontal: isMobile ? 15 : (isTablet ? 20 : 25),
