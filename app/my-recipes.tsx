@@ -289,7 +289,7 @@ export default function MyRecipesScreen() {
     const renderMealPlanDetail = () => {
         if (!viewingMealPlan) return null;
         
-        const days = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday'];
+        const days = ['E Hene', 'E Marte', 'E Merkure', 'E Enjte', 'E Premte', 'E Shtune', 'E Diel'];
         
         return (
             <ScrollView style={styles.detailScrollContainer} contentContainerStyle={styles.scrollContentContainer}>
@@ -318,7 +318,7 @@ export default function MyRecipesScreen() {
                                     style={styles.mealPlanMealItem}
                                     onPress={() => handleShowRecipeDetails(viewingMealPlan.plan[day].breakfast)}
                                 >
-                                    <Text style={styles.mealPlanMealType}>Breakfast:</Text>
+                                    <Text style={styles.mealPlanMealType}>Mengjesi:</Text>
                                     <Text style={styles.mealPlanMealName}>{viewingMealPlan.plan[day].breakfast.name}</Text>
                                 </TouchableOpacity>
                             )}
@@ -328,7 +328,7 @@ export default function MyRecipesScreen() {
                                     style={styles.mealPlanMealItem}
                                     onPress={() => handleShowRecipeDetails(viewingMealPlan.plan[day].lunch)}
                                 >
-                                    <Text style={styles.mealPlanMealType}>Lunch:</Text>
+                                    <Text style={styles.mealPlanMealType}>Dreka:</Text>
                                     <Text style={styles.mealPlanMealName}>{viewingMealPlan.plan[day].lunch.name}</Text>
                                 </TouchableOpacity>
                             )}
@@ -338,7 +338,7 @@ export default function MyRecipesScreen() {
                                     style={styles.mealPlanMealItem}
                                     onPress={() => handleShowRecipeDetails(viewingMealPlan.plan[day].dinner)}
                                 >
-                                    <Text style={styles.mealPlanMealType}>Dinner:</Text>
+                                    <Text style={styles.mealPlanMealType}>Darka:</Text>
                                     <Text style={styles.mealPlanMealName}>{viewingMealPlan.plan[day].dinner.name}</Text>
                                 </TouchableOpacity>
                             )}
@@ -438,13 +438,13 @@ export default function MyRecipesScreen() {
                                 style={[styles.tabButton, activeTab === 'recipes' && styles.activeTab]}
                                 onPress={() => setActiveTab('recipes')}
                             >
-                                <Text style={[styles.tabText, activeTab === 'recipes' && styles.activeTabText]}>Recipes</Text>
+                                <Text style={[styles.tabText, activeTab === 'recipes' && styles.activeTabText]}>Recetat</Text>
                             </TouchableOpacity>
                             <TouchableOpacity 
                                 style={[styles.tabButton, activeTab === 'mealPlans' && styles.activeTab]}
                                 onPress={() => setActiveTab('mealPlans')}
                             >
-                                <Text style={[styles.tabText, activeTab === 'mealPlans' && styles.activeTabText]}>Meal Plans</Text>
+                                <Text style={[styles.tabText, activeTab === 'mealPlans' && styles.activeTabText]}>Planet javore</Text>
                             </TouchableOpacity>
                         </View>
 
@@ -452,7 +452,7 @@ export default function MyRecipesScreen() {
                             savedRecipes.length === 0 ? (
                                 <View style={styles.centeredEmpty}>
                                     <Ionicons name="archive-outline" size={60} color="#ccc" />
-                                    <Text style={styles.noRecipesText}>No saved recipes yet</Text>
+                                    <Text style={styles.noRecipesText}>Nuk ka receta te ruajtura</Text>
                                 </View>
                             ) : (
                                 <FlatList
@@ -486,7 +486,7 @@ export default function MyRecipesScreen() {
                                                 <View style={styles.imageOverlay}>
                                                     <Text style={styles.recipeName} numberOfLines={2}>{item.name}</Text>
                                                     <View style={styles.recipeFooter}>
-                                                        <Text style={styles.viewRecipeText}>View recipe</Text>
+                                                        <Text style={styles.viewRecipeText}>Shiko receten</Text>
                                                         <Ionicons name="arrow-forward" size={16} color="white" />
                                                     </View>
                                                 </View>
@@ -500,7 +500,7 @@ export default function MyRecipesScreen() {
                             savedMealPlans.length === 0 ? (
                                 <View style={styles.centeredEmpty}>
                                     <Ionicons name="calendar-outline" size={60} color="#ccc" />
-                                    <Text style={styles.noRecipesText}>No saved meal plans yet</Text>
+                                    <Text style={styles.noRecipesText}>Nuk ka plan javor vaktesh te ruajtur</Text>
                                 </View>
                             ) : (
                                 <FlatList

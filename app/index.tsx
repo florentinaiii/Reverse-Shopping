@@ -755,7 +755,7 @@ export default function App() {
             isTablet && styles.mealPlanModalContainerTablet
           ]}>
             <View style={styles.mealPlanModalHeader}>
-              <Text style={styles.mealPlanModalTitle}>Weekly Meal Plan</Text>
+              <Text style={styles.mealPlanModalTitle}>Plan javor vaktesh</Text>
               <TouchableOpacity onPress={() => setMealPlanModalVisible(false)}>
                 <Ionicons name="close" size={24} color="#333" />
               </TouchableOpacity>
@@ -773,7 +773,7 @@ export default function App() {
                     <Text style={styles.dayTitle}>{day}</Text>
                     <View style={styles.mealsContainer}>
                       <View style={styles.mealItem}>
-                        <Text style={styles.mealType}>Breakfast</Text>
+                        <Text style={styles.mealType}>Mengjesi</Text>
                         {weeklyMealPlan[day].breakfast ? (
                           <TouchableOpacity 
                             onPress={() => {
@@ -790,7 +790,7 @@ export default function App() {
                         )}
                       </View>
                       <View style={styles.mealItem}>
-                        <Text style={styles.mealType}>Lunch</Text>
+                        <Text style={styles.mealType}>Dreka</Text>
                         {weeklyMealPlan[day].lunch ? (
                           <TouchableOpacity 
                             onPress={() => {
@@ -807,7 +807,7 @@ export default function App() {
                         )}
                       </View>
                       <View style={styles.mealItem}>
-                        <Text style={styles.mealType}>Dinner</Text>
+                        <Text style={styles.mealType}>Darka</Text>
                         {weeklyMealPlan[day].dinner ? (
                           <TouchableOpacity 
                             onPress={() => {
@@ -832,7 +832,7 @@ export default function App() {
             <View style={styles.mealPlanButtonsContainer}>
               <TextInput
                 style={styles.mealPlanNameInput}
-                placeholder="Name your meal plan"
+                placeholder="Vendos nje emer"
                 value={mealPlanName}
                 onChangeText={setMealPlanName}
               />
@@ -841,13 +841,13 @@ export default function App() {
                   style={[styles.mealPlanActionButton, styles.regenerateButton]}
                   onPress={handleGenerateMealPlan}
                 >
-                  <Text style={styles.buttonText}>Regenerate</Text>
+                  <Text style={styles.buttonText}>Rigjeneroje</Text>
                 </TouchableOpacity>
                 <TouchableOpacity 
                   style={[styles.mealPlanActionButton, styles.saveButton]}
                   onPress={saveMealPlan}
                 >
-                  <Text style={styles.buttonText}>Save</Text>
+                  <Text style={styles.buttonText}>Ruaj</Text>
                 </TouchableOpacity>
               </View>
             </View>
@@ -1123,7 +1123,7 @@ function HomePage({
                       onPress={handleGenerateMealPlan}
                     >
                       <Ionicons name="calendar-outline" size={18} color="white" style={{marginRight: 8}} />
-                      <Text style={styles.showAllButtonText}>Generate Weekly Meal Plan</Text>
+                      <Text style={styles.showAllButtonText}>Gjenero një plan javor vaktesh</Text>
                     </TouchableOpacity>
                   </View>
                 </View>
