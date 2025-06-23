@@ -1,0 +1,15 @@
+{
+  "name": "reverse-shopping-render-deploy",
+  "version": "1.0.0",
+  "description": "Deployment package for Reverse Shopping on Render",
+  "scripts": {
+    "build-backend": "cd server && npm install",
+    "start-backend": "cd server && npm start",
+    "build-frontend": "npm install && npm run web:build",
+    "build": "npm run build-backend",
+    "start": "npm run start-backend"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+} 
